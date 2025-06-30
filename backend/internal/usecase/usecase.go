@@ -15,4 +15,5 @@ type UseCase struct {
 	RoomUseCase      roomcase.RoomUseCaseInterface
 	MessageUseCase   messagecase.MessageUseCaseInterface
 	WebsocketUseCase websocketcase.WebsocketUseCaseInterface
+	// TODO: signalingを追記
 }

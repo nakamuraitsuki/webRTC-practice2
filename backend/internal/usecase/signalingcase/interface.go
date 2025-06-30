@@ -1,4 +1,4 @@
-package signaling
+package signalingcase
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"example.com/infrahandson/internal/domain/entity"
 )
 
-type SignalingUseCase interface {
+type SignalingUseCaseInterface interface {
 	// StartSession は指定されたルームIDとユーザーIDで新しいセッションを開始します。
 	// 既存のセッションがある場合は、それを再利用します。
 	// 失敗した場合はエラーを返します。
