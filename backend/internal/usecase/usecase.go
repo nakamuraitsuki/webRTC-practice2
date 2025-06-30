@@ -4,6 +4,7 @@ package usecase
 import (
 	"example.com/infrahandson/internal/usecase/messagecase"
 	"example.com/infrahandson/internal/usecase/roomcase"
+	"example.com/infrahandson/internal/usecase/signalingcase"
 	"example.com/infrahandson/internal/usecase/usercase"
 	"example.com/infrahandson/internal/usecase/websocketcase"
 )
@@ -15,5 +16,5 @@ type UseCase struct {
 	RoomUseCase      roomcase.RoomUseCaseInterface
 	MessageUseCase   messagecase.MessageUseCaseInterface
 	WebsocketUseCase websocketcase.WebsocketUseCaseInterface
-	// TODO: signalingを追記
+	SignalingUseCase signalingcase.SignalingUseCaseInterface 
 }
