@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"example.com/infrahandson/internal/domain/entity"
+	"example.com/infrahandson/internal/domain/service"
 	"example.com/infrahandson/internal/usecase/websocketcase"
 	"github.com/labstack/echo/v4"
 )
@@ -57,8 +58,10 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 		var userID = userID
 		var roomID = roomID
 		defer conn.Close()
+
 		for {
-			message, err := conn.ReadMessage()
+			msgType, message, err := conn.ReadMessage()
+
 			if err != nil {
 				h.Logger.Warn("Connection closed or error reading message", "error", err)
 				_ = h.WsUseCase.DisconnectUser(wsCtx, websocketcase.DisconnectUserRequest{
@@ -67,15 +70,24 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 				return
 			}
 
-			h.Logger.Info("Message received", "room_public_id", roomID, "user_id", userID)
-			err = h.WsUseCase.SendMessage(wsCtx, websocketcase.SendMessageRequest{
-				RoomID:  entity.RoomID(roomID),
-				Sender:  entity.UserID(userID),
-				Content: message.GetContent(),
-			})
-			if err != nil {
-				h.Logger.Error("connection closed", err)
-				return
+			// メッセージの型を確認
+			if msgType == service.MsgTypeText {
+				h.Logger.Info("Message received", "room_public_id", roomID, "user_id", userID)
+
+				messageEntity, ok := message.(*entity.Message)
+				if !ok {
+					h.Logger.Error("Invalid message type received", "expected", "*entity.Message", "received", message)
+					continue
+				}
+				err = h.WsUseCase.SendMessage(wsCtx, websocketcase.SendMessageRequest{
+					RoomID:  entity.RoomID(roomID),
+					Sender:  entity.UserID(userID),
+					Content: messageEntity.GetContent(),
+				})
+				if err != nil {
+					h.Logger.Error("connection closed", err)
+					return
+				}
 			}
 		}
 	}()
