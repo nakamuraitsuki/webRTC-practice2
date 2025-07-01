@@ -38,9 +38,6 @@ func (i *SDPMessageInput) Validate() error {
 	if i.From == "" {
 		return errors.New("sdpMessageInput: From is required")
 	}
-	if i.To == "" {
-		return errors.New("sdpMessageInput: To is required")
-	}
 	if i.RoomID == "" {
 		return errors.New("sdpMessageInput: RoomID is required")
 	}
@@ -59,4 +56,35 @@ func NewSDPMessage(input SDPMessageInput) (*SDPMessage, error) {
 		to:      input.To,
 		roomID:  input.RoomID,
 	}, nil
+}
+
+// To をセットしたコピーを返す (Offer 一斉送信用)
+func (s *SDPMessage) WithTo(to UserID) *SDPMessage {
+	return &SDPMessage{
+		msgType: s.msgType,
+		sdp:     s.sdp,
+		from:    s.from,
+		to:      to,
+		roomID:  s.roomID,
+	}
+}
+
+func (s *SDPMessage) GetMsgType() SDPType {
+	return s.msgType
+}
+
+func (s *SDPMessage) GetSdp() string {
+	return s.sdp
+}
+
+func (s *SDPMessage) GetFrom() UserID {
+	return s.from
+}
+
+func (s *SDPMessage) GetTo() UserID {
+	return s.to
+}
+
+func (s *SDPMessage) GetRoomID() RoomID {
+	return s.roomID
 }
