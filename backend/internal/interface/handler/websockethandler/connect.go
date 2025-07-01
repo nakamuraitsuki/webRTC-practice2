@@ -61,9 +61,9 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 
 		for {
 			msgType, message, err := conn.ReadMessage()
-
 			if err != nil {
-				h.Logger.Warn("Connection closed or error reading message", "error", err)
+				h.Logger.Warn("Connection closed or error reading message", "error", err, "msgtype", msgType, "content", message)
+				h.Logger.Error("Disconnecting user", "room_public_id", roomID, "user_id", userID)
 				_ = h.WsUseCase.DisconnectUser(wsCtx, websocketcase.DisconnectUserRequest{
 					UserID: entity.UserID(userID),
 				})

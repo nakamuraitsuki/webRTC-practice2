@@ -38,7 +38,7 @@ func NewGorillaWebSocketConnection(
 // 汎用メッセージDTO
 // payloadにそれぞれのDTOを入れる
 type MessageDTO struct {
-	MsgType service.MsgType `json:"msg_type"` // メッセージのタイプ
+	MsgType service.MsgType `json:"message_type"` // メッセージのタイプ
 	Payload any             `json:"payload"`  // メッセージの内容
 }
 
@@ -72,7 +72,7 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 
 		return msgDTO.MsgType, message, nil
 	}
-	return "", nil, errors.New("unsupported message type")
+	return msgDTO.MsgType, msgDTO.Payload, errors.New("unsupported message type")
 }
 
 func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg any) error {

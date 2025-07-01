@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { getMessageHistory } from "../api/getMessageHistory";
-import { MessageResponse } from "../type";
+import { TextMessage } from "../type";
 
 // 1ページあたりのメッセージ数
 const MESSAGE_LIMIT = 20;
 
 export const useRoomHistory = (roomId: string, initialLoad = true) => {
-  const [messages, setMessages] = useState<MessageResponse[]>([]);
+  const [messages, setMessages] = useState<TextMessage[]>([]);
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(false);
   const [nextBeforeSentAt, setNextBeforeSentAt] = useState<string | null>(null);
