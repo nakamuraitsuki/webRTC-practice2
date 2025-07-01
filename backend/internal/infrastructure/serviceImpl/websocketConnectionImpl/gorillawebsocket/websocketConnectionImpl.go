@@ -2,11 +2,11 @@ package gorillawebsocket
 
 import (
 	"errors"
-	"time"
 
 	"example.com/infrahandson/internal/domain/entity"
 	"example.com/infrahandson/internal/domain/service"
 	"example.com/infrahandson/internal/interface/adapter"
+	"github.com/mitchellh/mapstructure"
 )
 
 type GorillaWebSocketConnection struct {
@@ -35,51 +35,60 @@ func NewGorillaWebSocketConnection(
 	}
 }
 
+// 汎用メッセージDTO
+// payloadにそれぞれのDTOを入れる
 type MessageDTO struct {
-	ID       entity.MessageID       // メッセージID
-	RoomID   entity.RoomID          // 所属するチャットルームのID
-	UserID   entity.UserID          // 投稿者のID（匿名なら名前など）
-	Content  string                 // 本文
-	SentAt   time.Time              // 送信日時
+	MsgType service.MsgType `json:"msg_type"` // メッセージのタイプ
+	Payload any             `json:"payload"`  // メッセージの内容
 }
 
-func (m *MessageDTO) ToEntity() *entity.Message {
-	return entity.NewMessage(entity.MessageParams{
-		ID:       m.ID,
-		RoomID:   m.RoomID,
-		UserID:   m.UserID,
-		Content:  m.Content,
-		SentAt:   m.SentAt,
-	})
-}
-
-func (m *MessageDTO) FromEntity(msg *entity.Message) {
-	m.ID = msg.GetID()
-	m.ID = msg.GetID()
-	m.RoomID = msg.GetRoomID()
-	m.UserID = msg.GetUserID()
-	m.Content = msg.GetContent()
-	m.SentAt = msg.GetSentAt()
-}
-
-func (c *GorillaWebSocketConnection) ReadMessage() (*entity.Message, error) {
+func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error) {
 	var msgDTO MessageDTO
 	err := c.conn.ReadJSON(&msgDTO)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	return msgDTO.ToEntity(), nil
+	// payload の型不定を解消しにかかる
+	// とりあえず map[string]any として扱う
+	rawMap, ok := msgDTO.Payload.(map[string]any)
+	if !ok {
+		return "", nil, errors.New("invalid payload type")
+	}
+
+	if msgDTO.MsgType == service.MsgTypeText {
+		var textMsgDTO TextMessageDTO
+		// map[string]any から TextMessageDTO に変換
+		// mapstructure を使う
+		if err := mapstructure.Decode(rawMap, &textMsgDTO); err != nil {
+			return "", nil, err
+		}
+
+		// TextMessageDTO から entity.Message に変換
+		message := textMsgDTO.ToEntity()
+		if message == nil {
+			return "", nil, errors.New("failed to convert TextMessageDTO to entity.Message")
+		}
+
+		return msgDTO.MsgType, message, nil
+	}
+	return "", nil, errors.New("unsupported message type")
 }
 
-func (c *GorillaWebSocketConnection) WriteMessage(msg *entity.Message) error {
-	msgDTO := MessageDTO{}
-	msgDTO.FromEntity(msg)
-	err := c.conn.WriteJSON(msgDTO)
-	if err != nil {
-		return err
+func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg any) error {
+	// メッセージのタイプによって使い分け
+	if msgType == service.MsgTypeText {
+		if message, ok := msg.(*entity.Message); ok {
+			msgDTO := TextMessageDTO{}
+			msgDTO.FromEntity(message)
+			return c.conn.WriteJSON(&MessageDTO{
+				MsgType: msgType,
+				Payload: msgDTO,
+			})
+		}
+		return errors.New("invalid message type for text message")
 	}
-	return nil
+	return errors.New("unsupported message type")
 }
 
 func (c *GorillaWebSocketConnection) Close() error {

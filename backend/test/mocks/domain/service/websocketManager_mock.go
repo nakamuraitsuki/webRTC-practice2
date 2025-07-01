@@ -57,12 +57,13 @@ func (mr *MockWebSocketConnectionMockRecorder) Close() *gomock.Call {
 }
 
 // ReadMessage mocks base method.
-func (m *MockWebSocketConnection) ReadMessage() (*entity.Message, error) {
+func (m *MockWebSocketConnection) ReadMessage() (service.MsgType, any, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReadMessage")
-	ret0, _ := ret[0].(*entity.Message)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(service.MsgType)
+	ret1, _ := ret[1].(any)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // ReadMessage indicates an expected call of ReadMessage.
@@ -72,17 +73,17 @@ func (mr *MockWebSocketConnectionMockRecorder) ReadMessage() *gomock.Call {
 }
 
 // WriteMessage mocks base method.
-func (m *MockWebSocketConnection) WriteMessage(arg0 *entity.Message) error {
+func (m *MockWebSocketConnection) WriteMessage(arg0 service.MsgType, arg1 any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteMessage", arg0)
+	ret := m.ctrl.Call(m, "WriteMessage", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WriteMessage indicates an expected call of WriteMessage.
-func (mr *MockWebSocketConnectionMockRecorder) WriteMessage(arg0 any) *gomock.Call {
+func (mr *MockWebSocketConnectionMockRecorder) WriteMessage(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMessage", reflect.TypeOf((*MockWebSocketConnection)(nil).WriteMessage), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteMessage", reflect.TypeOf((*MockWebSocketConnection)(nil).WriteMessage), arg0, arg1)
 }
 
 // MockWebsocketManager is a mock of WebsocketManager interface.
