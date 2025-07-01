@@ -96,6 +96,7 @@ func (m *InMemoryWebSocketManager) GetConnectionsByRoomID(ctx context.Context, r
 func (m *InMemoryWebSocketManager) BroadcastToRoom(ctx context.Context, roomID entity.RoomID, msg *entity.Message) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
+	msgType := service.MsgTypeText
 
 	users, exists := m.connectionsByRoom[roomID]
 	if !exists {
@@ -103,7 +104,7 @@ func (m *InMemoryWebSocketManager) BroadcastToRoom(ctx context.Context, roomID e
 	}
 
 	for _, conn := range users {
-		if err := conn.WriteMessage(msg); err != nil {
+		if err := conn.WriteMessage(msgType, msg); err != nil {
 			return err
 		}
 	}
