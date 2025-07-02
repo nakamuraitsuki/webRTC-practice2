@@ -1,8 +1,22 @@
 import { useContext } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { AuthContext } from "../../../privider";
+import { Logout } from "../api/logout";
 
+// AuthProvider を使用＋ Logout API を使用するためのカスタムフック
+// GetMe と Logout が使える
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
+
+  const logout = async () => {
+    await Logout();          // API呼び出し
+    context.setUser(null);   // Providerの状態クリア
+  };
+
+  return {
+    user: context.user,
+    loading: context.loading,
+    refetch: context.refetch,
+    logout,
+  };
 };

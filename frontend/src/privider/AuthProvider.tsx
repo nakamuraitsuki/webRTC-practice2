@@ -1,17 +1,12 @@
 import { createContext, useEffect, useState, ReactNode } from "react";
-import { Logout } from "../api/logout";
-import apiClient from "../../utils/apiClient";
-
-type User = {
-  id: string;
-  name: string;
-};
+import { User } from "../models"; 
+import apiClient from "../utils/apiClient"; 
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
   refetch: () => void;
-  logout: () => void; 
+  setUser: (user: User | null) => void;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +15,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // GetMe の API を叩いて、ログイン状況確認
   const fetchUser = async () => {
     try {
       setLoading(true);
@@ -37,19 +33,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    // クッキーを削除するために、期限切れのクッキーをセット
-    document.cookie = "token=; Max-Age=0; path=/; SameSite=None; Secure"; 
-    Logout();
-    setUser(null); // ユーザー情報のリセット
-  };
-
   useEffect(() => {
     fetchUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, refetch: fetchUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, refetch: fetchUser, setUser: setUser }}>
       {children}
     </AuthContext.Provider>
   );
