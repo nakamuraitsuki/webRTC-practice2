@@ -56,6 +56,7 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 		return "", nil, errors.New("invalid payload type")
 	}
 
+	// テキストメッセージ
 	if msgDTO.MsgType == service.MsgTypeText {
 		var textMsgDTO TextMessageDTO
 		// map[string]any から TextMessageDTO に変換
@@ -72,6 +73,8 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 
 		return msgDTO.MsgType, message, nil
 	}
+
+	// SDPメッセージの処理
 	if msgDTO.MsgType == service.MsgTypeSDP {
 		var sdpMsgDTO SDPMessageDTO
 		// map[string]any から SDPMessageDTO に変換
@@ -88,11 +91,30 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 		return msgDTO.MsgType, sdpMessage, nil
 	}
 
+	// ICE候補メッセージの処理
+	if msgDTO.MsgType == service.MsgTypeICE {
+		var iceCandidateDTO IceCandidateDTO
+		// map[string]any から IceCandidateDTO に変換
+		if err := mapstructure.Decode(rawMap, &iceCandidateDTO); err != nil {
+			return "", nil, err
+		}
+
+		// IceCandidateDTO から entity.ICECandidate に変換
+		candidate, err := iceCandidateDTO.ToEntity()
+		if err != nil {
+			return "", nil, err
+		}
+
+		return msgDTO.MsgType, candidate, nil
+	}
+
 	return msgDTO.MsgType, msgDTO.Payload, errors.New("unsupported message type")
 }
 
 func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg any) error {
 	// メッセージのタイプによって使い分け
+
+	// テキストメッセージ
 	if msgType == service.MsgTypeText {
 		if message, ok := msg.(*entity.Message); ok {
 			msgDTO := TextMessageDTO{}
@@ -106,6 +128,8 @@ func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg a
 
 		return errors.New("invalid message type for text message")
 	}
+
+	// SDPメッセージ
 	if msgType == service.MsgTypeSDP {
 		if sdpMessage, ok := msg.(*entity.SDPMessage); ok {
 			msgDTO := SDPMessageDTO{}
@@ -120,6 +144,20 @@ func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg a
 		return errors.New("invalid message type for SDP message")
 	}
 
+	// ICE候補メッセージ
+	if msgType == service.MsgTypeICE {
+		if candidate, ok := msg.(*entity.ICECandidate); ok {
+			msgDTO := IceCandidateDTO{}
+			msgDTO.FromEntity(candidate)
+
+			return c.conn.WriteJSON(&MessageDTO{
+				MsgType: msgType,
+				Payload: msgDTO,
+			})
+		}
+
+		return errors.New("invalid message type for ICE candidate")
+	}
 	return errors.New("unsupported message type")
 }
 

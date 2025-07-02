@@ -11,7 +11,6 @@ type IceCandidateDTO struct {
 	RoomID        entity.RoomID `json:"room_id"`         // ルームID
 }
 
-// TODO: FromはUseCaseで設定されるはず。確認フローは後で実装
 func (dto *IceCandidateDTO) ToEntity() (*entity.ICECandidate, error) {
 	input := entity.ICECandidateInput{
 		Candidate:     dto.Candidate,
@@ -21,17 +20,16 @@ func (dto *IceCandidateDTO) ToEntity() (*entity.ICECandidate, error) {
 		To:            dto.To,
 		RoomID:        dto.RoomID,
 	}
-
+	
 	return entity.NewICECandidate(input)
 }
 
-func IceCandidateFromEntity(candidate *entity.ICECandidate) *IceCandidateDTO {
-	return &IceCandidateDTO{
-		Candidate:     candidate.GetCandidate(),
-		SdpMid:        candidate.GetSdpMid(),
-		SdpMLineIndex: candidate.GetSdpMLineIndex(),
-		From:          candidate.GetFrom(),
-		To:            candidate.GetTo(),
-		RoomID:        candidate.GetRoomID(),
-	}
+// TODO: FromはUseCaseで設定されるはず。確認フローは後で実装
+func (dto *IceCandidateDTO) FromEntity(candidate *entity.ICECandidate) {
+	dto.Candidate = candidate.GetCandidate()
+	dto.SdpMid = candidate.GetSdpMid()
+	dto.SdpMLineIndex = candidate.GetSdpMLineIndex()
+	dto.From = candidate.GetFrom()
+	dto.To = candidate.GetTo()
+	dto.RoomID = candidate.GetRoomID()
 }
