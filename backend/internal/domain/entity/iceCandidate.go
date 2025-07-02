@@ -55,3 +55,27 @@ func NewICECandidate(input ICECandidateInput) (*ICECandidate, error) {
 		roomID:        input.RoomID,
 	}, nil
 }
+
+func (i *ICECandidate) GetCandidate() string {
+	return i.candidate
+}
+
+func (i *ICECandidate) GetSdpMid() string {
+	return i.sdpMid
+}
+
+func (i *ICECandidate) GetSdpMLineIndex() uint16 {
+	return i.sdpMLineIndex
+}
+
+func (i *ICECandidate) GetFrom() UserID {
+	return i.from
+}
+
+func (i *ICECandidate) GetTo() UserID {
+	return i.to
+}
+
+func (i *ICECandidate) GetRoomID() RoomID {
+	return i.roomID
+}
