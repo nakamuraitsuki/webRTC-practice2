@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+
 import { RegisterFormData } from "../types/RegisterFormData";
 import { useAuth } from "../hooks/useAuth";
-import { Register } from "../api/register";
+import { UserRepo } from "../repository/userRepositoryImpl";
 import { Form } from "../../ui/Form";
+import { RegisterParams } from "../repository/userRepository";
 
 import styles from "./RegisterForm.module.css";
 
@@ -18,7 +20,10 @@ export const RegisterForm = () => {
 
   const registerHandler = async (data: RegisterFormData) => {
     try {
-      await Register({data, refetch});
+
+      const input: RegisterParams = { data, refetch };
+      await UserRepo.register(input);
+
       navigate('/');
     } catch (error) {
       console.error("Register failed:", error);

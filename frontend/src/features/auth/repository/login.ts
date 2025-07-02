@@ -1,16 +1,13 @@
-import { LoginFormData } from "../types/LoginFormDate";
 import apiClient from "../../utils/apiClient";
+import { LoginParams } from "./userRepository";
 
-type LoginParams = {
-  data: LoginFormData;
-  refetch: () => void;
-}
-
+// ユーザーログインの処理を行う関数
+// userRepositoryImpl.ts でimport されて、具体実装に利用される
 export const Login = async ({ data, refetch }: LoginParams): Promise<void> => {
   try {
     const res = await apiClient.post("/api/user/login", data);
     console.log(res);
-    
+
     // ここではaxiosのレスポンスデータを直接利用できます
     if (res.ok) {
       // 成功時の処理

@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
-import { LoginFormData } from "../types/LoginFormDate";
+import { LoginFormData } from "../types/LoginFormData";
 import { useAuth } from "../hooks/useAuth";
-import { Login } from "../api/login";
 import { Form } from "../../ui/Form";
 import { useNavigate } from "react-router-dom";
 
 import styles from "./LoginForm.module.css";
-import { LoginParams } from "../types/LoginParams";
+import { LoginParams } from "../repository/userRepository";
+import { UserRepo } from "../repository/userRepositoryImpl";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -19,7 +19,9 @@ export const LoginForm = () => {
 
   const handleLogin = async (data: LoginFormData) => {
     try {
-      await Login({data, refetch} as LoginParams);
+      const input: LoginParams = { data, refetch };
+      await UserRepo.login(input);
+
       navigate('/');
     } catch (error) {
       console.error("Login failed:", error);
