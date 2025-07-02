@@ -72,6 +72,22 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 
 		return msgDTO.MsgType, message, nil
 	}
+	if msgDTO.MsgType == service.MsgTypeSDP {
+		var sdpMsgDTO SDPMessageDTO
+		// map[string]any から SDPMessageDTO に変換
+		if err := mapstructure.Decode(rawMap, &sdpMsgDTO); err != nil {
+			return "", nil, err
+		}
+		
+		// SDPMessageDTO から entity.SDPMessage に変換
+		sdpMessage := sdpMsgDTO.ToEntity()
+		if sdpMessage == nil {
+			return "", nil, errors.New("failed to convert SDPMessageDTO to entity.SDPMessage")
+		}
+
+		return msgDTO.MsgType, sdpMessage, nil
+	}
+
 	return msgDTO.MsgType, msgDTO.Payload, errors.New("unsupported message type")
 }
 
@@ -81,13 +97,29 @@ func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg a
 		if message, ok := msg.(*entity.Message); ok {
 			msgDTO := TextMessageDTO{}
 			msgDTO.FromEntity(message)
+			
 			return c.conn.WriteJSON(&MessageDTO{
 				MsgType: msgType,
 				Payload: msgDTO,
 			})
 		}
+
 		return errors.New("invalid message type for text message")
 	}
+	if msgType == service.MsgTypeSDP {
+		if sdpMessage, ok := msg.(*entity.SDPMessage); ok {
+			msgDTO := SDPMessageDTO{}
+			msgDTO.FromEntity(sdpMessage)
+
+			return c.conn.WriteJSON(&MessageDTO{
+				MsgType: msgType,
+				Payload: msgDTO,
+			})
+		}
+
+		return errors.New("invalid message type for SDP message")
+	}
+
 	return errors.New("unsupported message type")
 }
 
