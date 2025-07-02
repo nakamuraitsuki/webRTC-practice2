@@ -14,9 +14,16 @@ type UserConnection struct {
 }
 
 // コネクションの抽象化
+type MsgType string
+
+const (
+	MsgTypeText MsgType = "text"
+	MsgTypeSDP	MsgType = "sdp"
+	MsgTypeICE MsgType = "ice"
+)
 type WebSocketConnection interface {
-	ReadMessage() (*entity.Message, error)
-	WriteMessage(*entity.Message) error
+	ReadMessage() (MsgType, any, error)
+	WriteMessage(MsgType, any) error
 	Close() error
 }
 

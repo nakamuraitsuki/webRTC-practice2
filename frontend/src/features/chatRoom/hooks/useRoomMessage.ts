@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { useRoomHistory } from './useRoomHistory';
 import { useRoomSocket } from './useRoomSocket';
-import { MessageResponse } from '../type';
+import { TextMessage } from '../type';
 
 // メッセージ配列を sent_at の降順（新しい順）でソート
-const mergeMessages = (history: MessageResponse[], realtime: MessageResponse[]) => {
+const mergeMessages = (history: TextMessage[], realtime: TextMessage[]) => {
   const all = [...history, ...realtime];
-  const uniqueMap = new Map<string, MessageResponse>();
+  const uniqueMap = new Map<string, TextMessage>();
 
   for (const msg of all) {
     uniqueMap.set(msg.id, msg); // 同じIDのメッセージは上書き（重複排除）
