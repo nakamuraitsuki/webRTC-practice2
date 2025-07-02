@@ -3,8 +3,9 @@ import { Form } from "../../../ui/Form";
 import { CreateRoomFormData } from "../../types/CreateRoomFormDate";
 
 import styles from "./CreateRoomForm.module.css";
-import { CreateRoomApi } from "../../api";
 import { useNavigate } from "react-router-dom";
+import { CreateRoomParams } from "../../repository/roomRepository";
+import { RoomRepo } from "../../repository/roomRepositoryImpl";
 
 export const CreateRoomForm = () => {
   const navigate = useNavigate();
@@ -14,7 +15,9 @@ export const CreateRoomForm = () => {
   } = useForm<CreateRoomFormData>();
   const handleCreateRoom = async (data: CreateRoomFormData) => {
     try {
-      await CreateRoomApi(data);
+      const param: CreateRoomParams = { name: data.name };
+      await RoomRepo.createRoom(param);
+      
       console.log("Room created:", data);
       navigate("/room");
     } catch (error) {

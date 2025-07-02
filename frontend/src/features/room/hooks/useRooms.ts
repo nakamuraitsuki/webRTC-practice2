@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { getAllRoomsApi } from '../api';
-import { GetAllRoomsResponse } from '../types/GetAllRoomsResponse';
+import { RoomRepo } from '../repository/roomRepositoryImpl';
+import { Room } from '../models/room';
 
 export const useRooms = () => {
-  const [rooms, setRooms] = useState<GetAllRoomsResponse[]>([]); // ルームのデータを格納
+  const [rooms, setRooms] = useState<Room[]>([]); // ルームのデータを格納
   const [loading, setLoading] = useState<boolean>(true); // ローディング状態
   const [error, setError] = useState<string | null>(null); // エラーメッセージ
 
@@ -12,13 +12,9 @@ export const useRooms = () => {
       try {
         setLoading(true);
         setError(null); // エラーメッセージをリセット
-        const roomsData = await getAllRoomsApi(); // API呼び出し
 
-        const rooms: GetAllRoomsResponse[] = roomsData.map((room: any) => ({
-          id: room.room_id,
-          name: room.name,
-        })); // 型を指定
-        
+        const rooms = await RoomRepo.getAllRooms();
+
         setRooms(rooms); // 取得したデータを設定
       } catch (err: any) {
         setError(err.message || "ルームの取得に失敗しました");

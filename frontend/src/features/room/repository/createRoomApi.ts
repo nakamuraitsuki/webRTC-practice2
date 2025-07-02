@@ -1,7 +1,7 @@
 import apiClient from "../../utils/apiClient"
-import { CreateRoomFormData } from "../types/CreateRoomFormDate"
+import { CreateRoomParams } from "./roomRepository";
 
-export const CreateRoomApi = async (data : CreateRoomFormData) => {
+export const CreateRoom = async (data : CreateRoomParams) => {
   const response = await apiClient.post("/api/room", data);
 
   if (!response.ok) {

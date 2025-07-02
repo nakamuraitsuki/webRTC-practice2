@@ -1,10 +1,10 @@
-import { GetAllRoomsResponse } from "../../types/GetAllRoomsResponse";
+import { Room } from "../../models/room";
 
 import styles from "./index.module.css";
 import { RoomListItem } from "./RoomListItem";
 
 type RoomListProps = {
-  rooms: GetAllRoomsResponse[];
+  rooms: Room[];
 };
 
 export const RoomList = ({ rooms }: RoomListProps) => {
