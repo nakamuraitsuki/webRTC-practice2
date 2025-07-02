@@ -11,6 +11,7 @@ type IceCandidateDTO struct {
 	RoomID        entity.RoomID `json:"room_id"`         // ルームID
 }
 
+// TODO: FromはUseCaseで設定されるはず。確認フローは後で実装
 func (dto *IceCandidateDTO) ToEntity() (*entity.ICECandidate, error) {
 	input := entity.ICECandidateInput{
 		Candidate:     dto.Candidate,
