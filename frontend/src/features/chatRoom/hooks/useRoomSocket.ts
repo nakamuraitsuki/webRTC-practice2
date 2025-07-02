@@ -21,7 +21,7 @@ export const useRoomSocket = (roomId: string) => {
       const msg: Message = {
         message_type: data.message_type,
         payload: {
-          id: data.payload_id as string,
+          id: data.payload.id as string,
           user_id: data.payload.user_id as string,
           room_id: data.payload.room_id as string,
           sent_at: data.payload.sent_at as string,
@@ -43,10 +43,6 @@ export const useRoomSocket = (roomId: string) => {
   const sendMessage = useCallback((message: Message) => {
     if (socketRef.current) {
       sendRoomMessage(socketRef.current, message);
-
-      if (message.message_type === 'text') {
-        setMessages((prev) => [...prev, message.payload as TextMessage]);
-      }
     }
     console.log('Sent message:', message);
   }, []);
