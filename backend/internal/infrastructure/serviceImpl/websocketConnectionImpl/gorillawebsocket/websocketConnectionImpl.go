@@ -80,8 +80,8 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 		}
 		
 		// SDPMessageDTO から entity.SDPMessage に変換
-		sdpMessage := sdpMsgDTO.ToEntity()
-		if sdpMessage == nil {
+		sdpMessage, err := sdpMsgDTO.ToEntity()
+		if err == nil {
 			return "", nil, errors.New("failed to convert SDPMessageDTO to entity.SDPMessage")
 		}
 
@@ -97,7 +97,7 @@ func (c *GorillaWebSocketConnection) WriteMessage(msgType service.MsgType, msg a
 		if message, ok := msg.(*entity.Message); ok {
 			msgDTO := TextMessageDTO{}
 			msgDTO.FromEntity(message)
-			
+
 			return c.conn.WriteJSON(&MessageDTO{
 				MsgType: msgType,
 				Payload: msgDTO,

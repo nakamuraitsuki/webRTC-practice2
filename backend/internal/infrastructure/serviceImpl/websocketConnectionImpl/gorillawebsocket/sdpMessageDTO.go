@@ -12,19 +12,14 @@ type SDPMessageDTO struct {
 	RoomID  entity.RoomID  `json:"room_id"`
 }
 
-func (m *SDPMessageDTO) ToEntity() *entity.SDPMessage {
-	SDPEntity, err := entity.NewSDPMessage(entity.SDPMessageInput{
+func (m *SDPMessageDTO) ToEntity() (*entity.SDPMessage, error) {
+	return entity.NewSDPMessage(entity.SDPMessageInput{
 		MsgType: m.SDPType,
 		Sdp:     m.Sdp,
 		From:    m.From,
 		To:      m.To,
 		RoomID:  m.RoomID,
 	})
-
-	if err != nil {
-		return nil // or handle the error as needed
-	}
-	return SDPEntity
 }
 
 func (m *SDPMessageDTO) FromEntity(sdpMsg *entity.SDPMessage) {
