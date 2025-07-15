@@ -5,7 +5,7 @@ import { ChatInput } from '../components';
 import styles from './RoomPage.module.css';
 import { useRoomMessages } from '../hooks/useRoomMessage';
 import { MessageList } from '../components/MessageList';
-import { useAuth } from '../../auth/hooks/useAuth';
+import { useAuth } from '../../../app/hooks/useAuth';
 import { TextMessage, Message } from '../type';
 
 type FormData = {

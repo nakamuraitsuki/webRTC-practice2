@@ -1,15 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../auth/hooks/useAuth'
 import styles from './Header.module.css'
 import apiClient from '../../utils/apiClient'
 import { Icon } from '../../ui/icon'
+import { useAuth } from '../../../app/hooks/useAuth'
 
 export const Header = () => {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, usecase } = useAuth()
   const handleLogout = async () => {
     try {
-      logout()
+      usecase.logout();
       navigate('/')
     } catch (error) {
       console.error('Logout failed:', error)

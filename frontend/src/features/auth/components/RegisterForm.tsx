@@ -1,36 +1,19 @@
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-
-import { RegisterFormData } from "../types/RegisterFormData";
-import { useAuth } from "../hooks/useAuth";
-import { UserRepo } from "../repository/userRepositoryImpl";
-import { Form } from "../../ui/Form";
-import { RegisterParams } from "../repository/userRepository";
-
+import React from "react";
 import styles from "./RegisterForm.module.css";
+import { useForm } from "react-hook-form";
+import { Form } from "../../ui/Form";
+import { User } from "../../../domains/user/models/User";
+import { RegisterFormData } from "../pages";
 
-export const RegisterForm = () => {
-  const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-  } = useForm<RegisterFormData>()
-  const { user, loading, refetch } = useAuth();
-  if (loading) return <div>Loading...</div>;
+export type RegisterFormProps = {
+  user: User | null;
+  register: ReturnType<typeof useForm<RegisterFormData>>["register"];
+  onSubmit: (e?: React.BaseSyntheticEvent) => void;
+}
 
-  const registerHandler = async (data: RegisterFormData) => {
-    try {
-
-      const input: RegisterParams = { data, refetch };
-      await UserRepo.register(input);
-
-      navigate('/');
-    } catch (error) {
-      console.error("Register failed:", error);
-    }
-  };
+export const RegisterForm = ({ user, register, onSubmit }: RegisterFormProps) => {
   return (
-    <form className={styles.form} onSubmit={handleSubmit(registerHandler)}>
+    <form className={styles.form} onSubmit={onSubmit}>
       <Form.Field>
         <Form.Label label="Name" />
         <Form.Input
