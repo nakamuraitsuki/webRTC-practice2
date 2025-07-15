@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import styles from "./RoomListItem.module.css";
-import { Room } from "../../models/room";
+import { Room } from "../../../../domains/room/models/Room";
 
 type RoomListItemProps = {
   room: Room;

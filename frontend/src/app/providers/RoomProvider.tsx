@@ -4,7 +4,7 @@ import { createRoomUseCase, RoomUseCase } from "../../domains/room/usecase/RoomU
 import { createRoomRepository } from "../../infrastructure/api/RoomRepositoryImpl";
 
 type RoomContextValue = {
-  rooms: Room[] | null;
+  rooms: Room[];
   usecase: RoomUseCase
 }
 

@@ -1,5 +1,5 @@
-import { Room } from "../../models/room";
 
+import { Room } from "../../../../domains/room/models/Room";
 import styles from "./index.module.css";
 import { RoomListItem } from "./RoomListItem";
 

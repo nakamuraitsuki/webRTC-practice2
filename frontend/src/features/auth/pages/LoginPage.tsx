@@ -1,6 +1,6 @@
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../app/hooks/useAuth";
-import { LoginForm } from "../components/LoginForm";
+import { LoginForm, LoginFormProps } from "../components/LoginForm";
 import styles from "./LoginPage.module.css";
 import { useForm } from "react-hook-form";
 import { UserUseCase } from "../../../domains/user/usecases/UserUseCase";
@@ -37,7 +37,7 @@ export const LoginPage = () => {
     LoginHandler(data, usecase, navigate);
   });
 
-  const loginFormProps = {
+  const loginFormProps: LoginFormProps = {
     user,
     register,
     onSubmit,

@@ -12,7 +12,13 @@ export const createRoomUseCase = (repo: RoomRepository): RoomUseCase => {
       await repo.create(input);
     },
     getAllRooms: async () => {
-      return await repo.getAll();
+      const data = await repo.getAll();
+      if(!data) {
+        return [];
+      }
+      else {
+        return data;
+      }
     }
   };
 }

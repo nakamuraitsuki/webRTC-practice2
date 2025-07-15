@@ -1,6 +1,6 @@
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../app/hooks/useAuth";
-import { RegisterForm } from "../components/RegisterForm";
+import { RegisterForm, RegisterFormProps } from "../components/RegisterForm";
 import { RegisterInput } from "../../../domains/user/repositories/UserRepository";
 
 import styles from "./RegisterPage.module.css";
@@ -42,7 +42,7 @@ export const RegisterPage = () => {
     RegisterHandler(data, usecase, navigate);
   });
 
-  const registerProps = {
+  const registerProps: RegisterFormProps = {
     user,
     register,
     onSubmit,
