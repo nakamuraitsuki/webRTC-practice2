@@ -2,9 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "../features/home";
 import { Layout } from "../features/layout";
 import { LoginPage, RegisterPage } from "../features/auth";
-import { CreateRoomPage, RoomListPage } from "../features/room";
-import { RoomPage } from "../features/chatRoom"; 
+import { CreateRoomPage, RoomListPage, RoomPage } from "../features/room";
 import { ImageUploadPage } from "../features/icon/pages";
+import { RoomProvider } from "./providers/RoomProvider";
 
 export const appRouter = createBrowserRouter([
   {
@@ -34,6 +34,11 @@ export const appRouter = createBrowserRouter([
       },
       {
         path: "room",
+        element: (
+          <RoomProvider>
+            <RoomListPage />
+          </RoomProvider>
+        ),
         children: [
           {
             index: true,
