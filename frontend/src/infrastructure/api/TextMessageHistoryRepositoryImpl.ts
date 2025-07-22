@@ -1,4 +1,4 @@
-import { GetHistoryInput, GetHistoryOutput } from "../../domains/message/repotisories/TextMessageHistoryRepository"
+import { GetHistoryInput, GetHistoryOutput } from "../../domains/TextMessage/repotisories/TextMessageHistoryRepository"
 import { apiClient } from "./apiClient"
 
 export const createTextMessageHistoryRepository = () => {
