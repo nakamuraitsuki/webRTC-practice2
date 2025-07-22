@@ -25,7 +25,8 @@ export const TextMessageProvider = ({ children }: { children: React.ReactNode })
       getMessageHistory(input) {
         return textMessageHistoryUseCase.getMessageHistory(input)
           .then((messages) => {
-            setComments(messages.data.messages);
+            // メッセージを配列の後ろに追加
+            setComments((prev) => [...prev, ...messages.data.messages]);
             return messages;
           })
           .catch(() => {
