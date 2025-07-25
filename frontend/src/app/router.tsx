@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { HomePage } from "../features/home";
 import { Layout } from "../features/layout";
 import { LoginPage, RegisterPage } from "../features/auth";
@@ -6,6 +6,7 @@ import { CreateRoomPage, RoomListPage } from "../features/room";
 import { ImageUploadPage } from "../features/icon/pages";
 import { RoomProvider } from "./providers/RoomProvider";
 import { RoomPage } from "../features/chatRoom";
+import { TextMessageProvider } from "./providers/TextMessageProvider";
 
 export const appRouter = createBrowserRouter([
   {
@@ -37,7 +38,7 @@ export const appRouter = createBrowserRouter([
         path: "room",
         element: (
           <RoomProvider>
-            <RoomListPage />
+            <Outlet />
           </RoomProvider>
         ),
         children: [
@@ -52,9 +53,9 @@ export const appRouter = createBrowserRouter([
           {
             path: ":roomId",
             element: (
-              <RoomProvider>
+              <TextMessageProvider>
                 <RoomPage />
-              </RoomProvider>
+              </TextMessageProvider>
             ),
           }
         ]
