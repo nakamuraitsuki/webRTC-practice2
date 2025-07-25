@@ -1,59 +1,62 @@
-import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { ChatInput } from '../components';
-
-import styles from './RoomPage.module.css';
-import { useRoomMessages } from '../hooks/useRoomMessage';
-import { MessageList } from '../components/MessageList';
-import { useAuth } from '../../../app/hooks/useAuth';
-import { TextMessage, Message } from '../type';
-
-type FormData = {
-  message: string;
-};
+import { useTextMessage } from '../../../app/hooks/useTextMessage';
 
 export const RoomPage = () => {
-  const { user } = useAuth();
   const { roomId } = useParams<{ roomId: string }>();
   if (!roomId) return <div>Room ID is required</div>;
 
-  const { register, handleSubmit, reset } = useForm<FormData>();
-  const { messages, loadMore, sendMessage, hasNext } = useRoomMessages(roomId);
-  console.log('messages', messages);
+  const { comments } = useTextMessage(roomId);
 
-  const onSubmit = (data: FormData) => {
-    if (data.message.trim()) {
-      const msg: Message = {
-        message_type: 'text',
-        payload: {
-          id: crypto.randomUUID(), // 一意のIDを生成
-          user_id: user?.id || 'anonymous', // ユーザーIDを設定
-          room_id: roomId, // ルームIDを設定
-          sent_at: new Date().toISOString(), // 現在時刻をISO形式で設定
-          content: data.message, // 入力されたメッセージ
-        } as TextMessage,
-      }
-      sendMessage(msg);
-      reset(); // フォームの値をリセット
-    }
-  };
-
+  console.log('comments', comments);
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <ChatInput.Field>
-          <ChatInput.Input
-            {...register('message')}
-            placeholder="メッセージを入力"
-          />
-          <ChatInput.Button />
-        </ChatInput.Field>
-      </form>
-      <MessageList
-        messages={messages}
-        fetchMore={loadMore}
-        hasNext={hasNext}
-      />
+      RoomPage
     </div>
-  );
-};
+  )
+}
+
+// export const RoomPage = () => {
+//   const { user } = useAuth();
+//   const { roomId } = useParams<{ roomId: string }>();
+//   if (!roomId) return <div>Room ID is required</div>;
+
+//   const { register, handleSubmit, reset } = useForm<FormData>();
+//   const { messages, loadMore, sendMessage, hasNext } = useRoomMessages(roomId);
+//   console.log('messages', messages);
+
+//   const onSubmit = (data: FormData) => {
+//     if (data.message.trim()) {
+//       const msg: Message = {
+//         message_type: 'text',
+//         payload: {
+//           id: crypto.randomUUID(), // 一意のIDを生成
+//           user_id: user?.id || 'anonymous', // ユーザーIDを設定
+//           room_id: roomId, // ルームIDを設定
+//           sent_at: new Date().toISOString(), // 現在時刻をISO形式で設定
+//           content: data.message, // 入力されたメッセージ
+//         } as TextMessage,
+//       }
+//       sendMessage(msg);
+//       reset(); // フォームの値をリセット
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+//         <ChatInput.Field>
+//           <ChatInput.Input
+//             {...register('message')}
+//             placeholder="メッセージを入力"
+//           />
+//           <ChatInput.Button />
+//         </ChatInput.Field>
+//       </form>
+//       <MessageList
+//         messages={messages}
+//         fetchMore={loadMore}
+//         hasNext={hasNext}
+//       />
+//     </div>
+//   );
+// };
