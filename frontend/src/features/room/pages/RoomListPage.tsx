@@ -7,6 +7,8 @@ import { useRoom } from "../../../app/hooks/useRoom";
 export const RoomListPage = () => {
   const { rooms } = useRoom();
 
+  if (!rooms) return <div>Loading...</div>;
+  
   return (
     <div className={styles.container}>
       <h1>Room List</h1>
