@@ -2,7 +2,7 @@
 
 import { Message } from "../../message/models/Message";
 
-export interface SocketRepository {
+export interface SocketService {
   connect(): void; // 接続開始
   disconnect(): void; // 接続終了
   send(message: Message): void; // メッセージ送信
