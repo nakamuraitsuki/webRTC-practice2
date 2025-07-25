@@ -51,8 +51,8 @@ export class SocketClient {
     this.listeners.set(messageType, handler as (data: any) => void);
   }
 
-  // 汎用送信関数
-  send(data: any) {
+  // Message型で送信
+  send(data: Message) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket is not open.");
       return;
