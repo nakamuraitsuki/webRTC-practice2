@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useRef, useState } from "react";
 import { TextMessage } from "../../domains/TextMessage/models/TextMessage";
 import { TextMessageHistoryUseCase } from "../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
 import { createTextMessageHistoryUseCase } from "../../domains/message/usecase/TextMessageHistoryUseCase";
@@ -15,6 +15,7 @@ export const TextMessageContext = createContext<TextMessageContextValue | undefi
 
 export const TextMessageProvider = ({ children }: { children: React.ReactNode }) => {
   const [comments, setComments] = useState<TextMessage[]>([]);
+  const seenIdsRef = useRef<Set<string>>(new Set());
 
   const textMessageHistoryRepo = createTextMessageHistoryRepository();
   const textMessageHistoryUseCase = createTextMessageHistoryUseCase(textMessageHistoryRepo);
@@ -22,11 +23,21 @@ export const TextMessageProvider = ({ children }: { children: React.ReactNode })
   // UseCaseがステートに関われるようにラップ
   const usecase = {
     history: {
-      getMessageHistory(input) {
+      async getMessageHistory(input) {
         return textMessageHistoryUseCase.getMessageHistory(input)
           .then((messages) => {
+            // 追加すべきMessageの抽出
+            const newMessages: TextMessage[] = [];
+            messages.data.messages.forEach(msg => {
+              if (!seenIdsRef.current.has(msg.id)) {
+                // setに追加
+                seenIdsRef.current.add(msg.id);
+                newMessages.push(msg);
+              }
+            });
+
             // メッセージを配列の後ろに追加
-            setComments((prev) => [...prev, ...messages.data.messages]);
+            setComments((prev) => [...prev, ...newMessages]);
             return messages;
           })
           .catch(() => {
