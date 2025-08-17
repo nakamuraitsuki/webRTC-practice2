@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { User } from "../../domains/user/models/User"
 import { createUserUseCase, UserUseCase } from "../../domains/user/usecases/UserUseCase";
 import { createUserRepository } from "../../infrastructure/api/UserRepositoryImpl";
@@ -6,11 +6,11 @@ import { createUserRepository } from "../../infrastructure/api/UserRepositoryImp
 type AuthContextValue = {
   user: User | null;
   usecase: UserUseCase;
-}
+};
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const userRepo = createUserRepository();
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     baseUsecase.getMe()
       .then(setUser)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
