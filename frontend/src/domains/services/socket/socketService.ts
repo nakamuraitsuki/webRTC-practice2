@@ -10,4 +10,5 @@ export interface SocketService {
     message_type: T, 
     callback: (message: MessageTypeMap[T]) => void,
   ): void; // メッセージ受信のコールバック登録
+  offMessage<T extends keyof MessageTypeMap>(message_type: T): void; // メッセージ受信のコールバック解除
 }

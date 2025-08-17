@@ -15,5 +15,8 @@ export const createSocketService = (endpoint: string): SocketService => {
     ) => {
       socketClient.on<MessageTypeMap[T]>(message_type, callback);
     },
+    offMessage: <T extends keyof MessageTypeMap>(message_type: T) => {
+      socketClient.off(message_type);
+    }
   }
 }

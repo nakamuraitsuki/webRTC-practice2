@@ -40,7 +40,6 @@ export class SocketClient {
   }
 
   // イベントリスナーを登録
-  // TODO：型について後で吟味
   on<T>(messageType: string, handler: (data: T) => void) {
     if (!this.socket) {
       console.warn("WebSocket is not connected.");
@@ -48,6 +47,16 @@ export class SocketClient {
     }
     // Mapに登録
     this.listeners.set(messageType, handler as (data: any) => void);
+  }
+
+  // イベントリスナーを削除
+  off(messageType: string) {
+    if (!this.socket) {
+      console.warn("WebSocket is not connected.");
+      return;
+    }
+    // Mapから削除
+    this.listeners.delete(messageType);
   }
 
   // Message型で送信

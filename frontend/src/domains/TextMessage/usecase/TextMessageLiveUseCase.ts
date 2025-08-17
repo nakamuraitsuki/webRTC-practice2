@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Message } from "../../message/models/Message";
 import { SocketService } from "../../services/socket/socketService";
 import { TextMessage } from "../models/TextMessage";
@@ -19,9 +20,16 @@ export interface TextMessageLiveUseCase {
 export const createTextMessageLiveUseCase = (socket: SocketService): TextMessageLiveUseCase => {
   return {
     sendMessage: async (input: SendTextMessageInput) => {
-      const message: Message = {
+
+      const message: Message<'text'> = {
         message_type: 'text',
-        payload: input as TextMessage
+        payload: {
+          id: randomUUID(),
+          room_id: input.room_id,
+          user_id: input.user_id,
+          content: input.content,
+          sent_at: new Date().toISOString(),
+        }
       }
 
       socket.send(message);
