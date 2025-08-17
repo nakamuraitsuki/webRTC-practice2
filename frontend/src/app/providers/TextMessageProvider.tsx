@@ -40,7 +40,10 @@ export const TextMessageProvider = ({ children }: { children: React.ReactNode })
                 newMessages.push(msg);
               }
             });
-  
+            
+            // sort
+            newMessages.sort((a, b) => new Date(b.sent_at).getTime() - new Date(a.sent_at).getTime());
+
             // メッセージを配列の後ろに追加
             setComments((prev) => [...prev, ...newMessages]);
             return messages;

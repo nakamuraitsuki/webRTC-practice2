@@ -1,0 +1,15 @@
+.odd {
+  background-color: var(--primary-50);
+}
+
+.item{
+  display: flex;
+  align-items: center;
+}
+
+.message {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--primary-900);
+  text-align: center;
+}

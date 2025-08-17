@@ -16,7 +16,7 @@ export const SocketProvider = ({
   roomId: string;
 }) => {
   const socketService = createSocketService(`/${roomId}`);
-  
+  socketService.connect();
   return (
     <SocketContext.Provider value={{ socketService }}>
       {children}
