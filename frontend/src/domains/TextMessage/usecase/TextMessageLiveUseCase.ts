@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { Message } from "../../message/models/Message";
 import { SocketService } from "../../services/socket/socketService";
 import { TextMessage } from "../models/TextMessage";
@@ -24,7 +23,7 @@ export const createTextMessageLiveUseCase = (socket: SocketService): TextMessage
       const message: Message<'text'> = {
         message_type: 'text',
         payload: {
-          id: randomUUID(),
+          id: crypto.randomUUID(),
           room_id: input.room_id,
           user_id: input.user_id,
           content: input.content,
