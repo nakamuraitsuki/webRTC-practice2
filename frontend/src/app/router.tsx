@@ -4,7 +4,7 @@ import { Layout } from "../features/layout";
 import { LoginPage, RegisterPage } from "../features/auth";
 import { CreateRoomPage, RoomListPage, RoomPage } from "../features/room";
 import { ImageUploadPage } from "../features/icon/pages";
-import { RoomProvider,TextMessageProvider } from "./providers";
+import { RoomProvider } from "./providers";
 
 export const appRouter = createBrowserRouter([
   {
@@ -51,9 +51,7 @@ export const appRouter = createBrowserRouter([
           {
             path: ":roomId",
             element: (
-              <TextMessageProvider>
-                <RoomPage />
-              </TextMessageProvider>
+              <RoomPage />
             ),
           }
         ]
