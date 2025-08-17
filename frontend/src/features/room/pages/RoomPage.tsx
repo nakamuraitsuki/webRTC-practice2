@@ -27,7 +27,7 @@ const SendMessageHandler = async (data: ChatFormData, roomId: string, uerId: str
 }
 
 const RoomContent = ({ roomId }: RoomContentProps) => {
-  const { register, handleSubmit } = useForm<ChatFormData>();
+  const { register, handleSubmit, reset } = useForm<ChatFormData>();
   const { user } = useAuth();
   const { comments, usecase } = useTextMessage();
   const [hasNext, setHasNext] = useState(true);
@@ -58,6 +58,7 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const chatProps: ChatFormProps = {
     register,
     onSubmit,
+    reset,
   };
 
   const messageListProps: MessageListProps = {

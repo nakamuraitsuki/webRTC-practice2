@@ -5,17 +5,27 @@ import { Form } from "../../../ui/Form";
 export type ChatFormProps = {
   register: ReturnType<typeof useForm<ChatFormData>>["register"];
   onSubmit: (e?: React.BaseSyntheticEvent) => void;
+  reset: () => void; // フォームクリア
 }
 
-export const ChatForm  = ({ register, onSubmit }: ChatFormProps) => {
+export const ChatForm  = ({ register, onSubmit, reset }: ChatFormProps) => {
+  // onSubmitにフォームクリア処理を追加
+  const handleSubmit = (e: React.BaseSyntheticEvent) => {
+    onSubmit(e);
+    reset();
+  };
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit}>
       <Form.Field>
         <Form.Input
           {...register('content')}
           placeholder="メッセージを入力"
+          required
         />
-        <Form.Button />
+        <Form.Button type="submit">
+          送信
+        </Form.Button>
       </Form.Field>
     </form>
   )
