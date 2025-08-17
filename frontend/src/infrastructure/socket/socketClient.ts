@@ -11,7 +11,6 @@ export class SocketClient {
   private readonly url: string;
   
   // イベントリスナーを管理するMap
-  // TODO: 現在は(any => void)だが、UseCaseが定まったら型を厳密にする
   private listeners: Map<string, (data: any) => void> = new Map();
 
   constructor(endpoint: string) {
