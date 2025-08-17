@@ -7,7 +7,7 @@ import (
 )
 
 type GetRoomsResponse struct {
-	ID   string `json:"room_id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 

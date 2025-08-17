@@ -63,3 +63,17 @@ func (w *WsClientID) WsClientID2UUID() (uuid.UUID, error) {
 func (w *WsClientID) UUID2WsClientID(id uuid.UUID) {
 	*w = WsClientID(id.String())
 }
+
+type RTCSessionID string
+// RTCSessionID -> UUID変換メソッド
+func (r *RTCSessionID) RTCSessionID2UUID() (uuid.UUID, error) {
+	id, err := uuid.Parse(string(*r))
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return id, nil
+}
+// UUID -> RTCSessionID変換メソッド
+func (r *RTCSessionID) UUID2RTCSessionID(id uuid.UUID) {
+	*r = RTCSessionID(id.String())
+}

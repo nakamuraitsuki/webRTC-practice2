@@ -1,32 +1,18 @@
 import { useForm } from "react-hook-form";
-import { LoginFormData } from "../types/LoginFormDate";
-import { useAuth } from "../hooks/useAuth";
-import { Login } from "../api/login";
+import { User } from "../../../domains/user/models/User";
 import { Form } from "../../ui/Form";
-import { useNavigate } from "react-router-dom";
-
 import styles from "./LoginForm.module.css";
-import { LoginParams } from "../types/LoginParams";
+import { LoginFormData } from "../pages";
 
-export const LoginForm = () => {
-  const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-  } = useForm<LoginFormData>()
-  const { user, loading, refetch } = useAuth();
-  if (loading) return <div>Loading...</div>;
+export type LoginFormProps = {
+  user: User | null;
+  register: ReturnType<typeof useForm<LoginFormData>>["register"];
+  onSubmit: (e?: React.BaseSyntheticEvent) => void;
+}
 
-  const handleLogin = async (data: LoginFormData) => {
-    try {
-      await Login({data, refetch} as LoginParams);
-      navigate('/');
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+export const LoginForm = ({ user, register, onSubmit }: LoginFormProps) => {
   return (
-    <form className={styles.form} onSubmit={handleSubmit(handleLogin)}>
+    <form className={styles.form} onSubmit={onSubmit}>
       <Form.Field>
         <Form.Label label="Email" />
         <Form.Input

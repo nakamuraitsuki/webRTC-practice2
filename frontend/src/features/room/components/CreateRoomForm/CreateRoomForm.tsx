@@ -1,28 +1,17 @@
 import { useForm } from "react-hook-form";
 import { Form } from "../../../ui/Form";
-import { CreateRoomFormData } from "../../types/CreateRoomFormDate";
-
 import styles from "./CreateRoomForm.module.css";
-import { CreateRoomApi } from "../../api";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { CreateRoomFormData } from "../../pages";
 
-export const CreateRoomForm = () => {
-  const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-  } = useForm<CreateRoomFormData>();
-  const handleCreateRoom = async (data: CreateRoomFormData) => {
-    try {
-      await CreateRoomApi(data);
-      console.log("Room created:", data);
-      navigate("/room");
-    } catch (error) {
-      console.error("Room creation failed:", error);
-    }
-  };
+export type CreateRoomFormProps = {
+  register: ReturnType<typeof useForm<CreateRoomFormData>>['register'];
+  onSubmit: (e?: React.BaseSyntheticEvent) => void;
+};
+
+export const CreateRoomForm = ({ register, onSubmit }: CreateRoomFormProps) => {
   return (
-    <form className={styles.form} onSubmit={handleSubmit(handleCreateRoom)}>
+    <form className={styles.form} onSubmit={onSubmit}>
       <Form.Field>
         <Form.Label label="Room Name" />
         <Form.Input
