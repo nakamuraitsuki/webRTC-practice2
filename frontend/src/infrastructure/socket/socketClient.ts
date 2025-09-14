@@ -5,6 +5,8 @@ export type URLInput = {
   endpoint: string;
 }
 
+// URLの共通化とMessage型の保証、MessageTypeごとの分岐管理という点でラップの意味がある
+
 export class SocketClient {
   private socket: WebSocket | null = null;
   private readonly baseUrl: string = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
