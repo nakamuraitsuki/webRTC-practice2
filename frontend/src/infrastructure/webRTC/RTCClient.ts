@@ -32,9 +32,9 @@ export class RTCClient {
     return answer;
   }
 
-  // Remote Answer を適用
-  async setRemoteAnswer(remoteAnswer: RTCSessionDescriptionInit) {
-    await this.pc.setRemoteDescription(new RTCSessionDescription(remoteAnswer));
+  // Remote Description (Offer/Answer) を適用
+  async setRemoteDescription(remoteDescription: RTCSessionDescriptionInit) {
+    await this.pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
   }
 
   // Remote ICE Candidate を追加
