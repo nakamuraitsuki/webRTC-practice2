@@ -1,0 +1,44 @@
+export type IceCandidateCallback = (candidate: RTCIceCandidateInit) => void;
+
+export class RTCClient {
+  private pc: RTCPeerConnection;
+
+  constructor(
+    private readonly config: RTCConfiguration,
+    private onIceCandidate: IceCandidateCallback
+  ) {
+    this.pc = new RTCPeerConnection(this.config);
+
+    // ICE Candidate が生成されたらコールバック
+    this.pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        this.onIceCandidate(event.candidate.toJSON());
+      }
+    };
+  }
+
+  // Offer を作成
+  async createOffer(): Promise<RTCSessionDescriptionInit> {
+    const offer = await this.pc.createOffer();
+    await this.pc.setLocalDescription(offer);
+    return offer;
+  }
+
+  // Remote Offer を受けて Answer を作成
+  async createAnswer(remoteOffer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
+    await this.pc.setRemoteDescription(new RTCSessionDescription(remoteOffer));
+    const answer = await this.pc.createAnswer();
+    await this.pc.setLocalDescription(answer);
+    return answer;
+  }
+
+  // Remote Answer を適用
+  async setRemoteAnswer(remoteAnswer: RTCSessionDescriptionInit) {
+    await this.pc.setRemoteDescription(new RTCSessionDescription(remoteAnswer));
+  }
+
+  // Remote ICE Candidate を追加
+  async addIceCandidate(candidate: RTCIceCandidateInit) {
+    await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+  }
+}
