@@ -1,6 +1,6 @@
 // Socket通信の抽象化インターフェース
 
-import { Message, MessageTypeMap } from "../../message/models/Message";
+import { Message, MessageTypeMap } from "../message/models/Message";
 
 export interface SocketService {
   connect(): void; // 接続開始
