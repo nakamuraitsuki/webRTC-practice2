@@ -39,6 +39,11 @@ export class RTCClient {
 
   // Remote ICE Candidate を追加
   async addIceCandidate(candidate: RTCIceCandidateInit) {
-    await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+    try {
+      await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+    } catch (error) {
+      console.error("Failed to add ICE candidate:", error, candidate);
+      throw new Error("Failed to add ICE candidate: " + (error instanceof Error ? error.message : String(error)));
+    }
   }
 }
