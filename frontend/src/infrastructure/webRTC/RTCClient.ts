@@ -5,7 +5,7 @@ export class RTCClient {
 
   constructor(
     private readonly config: RTCConfiguration,
-    private onIceCandidate: IceCandidateCallback
+    private readonly onIceCandidate: IceCandidateCallback
   ) {
     this.pc = new RTCPeerConnection(this.config);
 
