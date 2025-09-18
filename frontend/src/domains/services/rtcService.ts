@@ -1,9 +1,9 @@
 export interface RTCService {
   /**
-   * 新しい接続を開始する（Offerを作成）
+   * Offerを作成する
    * @returns OfferのSDP
    */
-  initiateConnection: () => Promise<RTCSessionDescriptionInit>
+  createOffer: () => Promise<RTCSessionDescriptionInit>
 
   /**
    * 受信したOfferに応答する
