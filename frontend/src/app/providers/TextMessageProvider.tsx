@@ -1,7 +1,7 @@
 import { createContext, useEffect, useMemo, useRef, useState } from "react";
 import { TextMessage } from "../../domains/TextMessage/models/TextMessage";
 import { TextMessageHistoryUseCase } from "../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
-import { createTextMessageHistoryUseCase } from "../../domains/message/usecase/TextMessageHistoryUseCase";
+import { createTextMessageHistoryUseCase } from "../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
 import { createTextMessageHistoryRepository } from "../../infrastructure/api/TextMessageHistoryRepositoryImpl";
 import { useSocket } from "../hooks/useSocket";
 import { createTextMessageLiveUseCase, TextMessageLiveUseCase } from "../../domains/TextMessage/usecase/TextMessageLiveUseCase";

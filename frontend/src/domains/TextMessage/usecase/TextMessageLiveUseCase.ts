@@ -1,5 +1,5 @@
 import { Message } from "../../message/models/Message";
-import { SocketService } from "../../services/socket/socketService";
+import { SocketService } from "../../services/socketService";
 import { TextMessage } from "../models/TextMessage";
 
 export type SendTextMessageInput = {
