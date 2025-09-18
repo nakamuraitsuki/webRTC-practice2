@@ -27,8 +27,9 @@ export interface RTCService {
   /**
    * 新しいICE Candidateが生成されたときのコールバックを登録する
    * @param callback 新しいICE Candidateが生成されたときに呼ばれるコールバック
+   * @returns コールバックの登録を解除するための関数
    */
-  onIceCandidate: (callback: (candidate: RTCIceCandidateInit) => void) => void
+  onIceCandidate: (callback: (candidate: RTCIceCandidateInit) => void) => () => void
 
   /**
    * 接続を終了する
