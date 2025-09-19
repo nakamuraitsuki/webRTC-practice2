@@ -34,7 +34,7 @@ export const createSignalingUseCase = (
         message_type: 'sdp',
         payload: {
           sdp_type: 'offer',
-          sdp: offer,
+          sdp: offer.sdp || '',
           from: input.user_id,
           room_id: input.room_id,
         }
@@ -57,13 +57,16 @@ export const createSignalingUseCase = (
           // 自分からのOfferは無視
           return;
         }
-        const answer: RTCSessionDescriptionInit = await rtc.respondToOffer(sdpPayload.sdp)
+        const answer: RTCSessionDescriptionInit = await rtc.respondToOffer({
+          type: 'offer',
+          sdp: sdpPayload.sdp,
+        })
         // Answerの組み立て
         const answerMessage: Message<'sdp'> = {
           message_type: 'sdp',
           payload: {
             sdp_type: 'answer',
-            sdp: answer,
+            sdp: answer.sdp || '',
             from: selfUserId,
             to: sdpPayload.from,
             room_id: sdpPayload.room_id,
@@ -77,7 +80,10 @@ export const createSignalingUseCase = (
           // 自分宛てのAnswerでなければ無視
           return;
         }
-        await rtc.applyRemoteAnswer(sdpPayload.sdp);
+        await rtc.applyRemoteAnswer({
+          type: 'answer',
+          sdp: sdpPayload.sdp || '',
+        });
       } else {
         throw new Error('Unknown SDP type');
       }
