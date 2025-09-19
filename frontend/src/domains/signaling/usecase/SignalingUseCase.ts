@@ -73,7 +73,7 @@ export const createSignalingUseCase = (
         socket.send(answerMessage);
       } else if (sdpPayload.sdp_type === 'answer') {
         // 受信したAnswerを適用する
-        if( msg.payload.to != selfUserId ) {
+        if( msg.payload.to !== selfUserId ) {
           // 自分宛てのAnswerでなければ無視
           return;
         }
