@@ -1,4 +1,5 @@
 import { TextMessage } from "../../TextMessage/models/TextMessage";
+import { SDPMessage, ICEMessage } from "../../signaling/models/models"; 
 
 export type MessageTypeMap = {
   'text': TextMessage;
@@ -10,21 +11,4 @@ export type MessageTypeMap = {
 export type Message<T extends keyof MessageTypeMap = keyof MessageTypeMap> = {
   message_type: T;
   payload: MessageTypeMap[T];
-};
-
-export type SDPMessage = {
-  sdp_type: 'offer' | 'answer';
-  sdp: string; // SDPの内容
-  from: string; // 送信者のユーザーID
-  to: string; // 受信者のユーザーID
-  room_id: string; // ルームID
-};
-
-export type ICEMessage = {
-  candidate: string; // ICE候補の文字列
-  sdp_mid: string; // SDPのメディア識別子
-  sdp_mline_index: number; // SDPのメディア行インデックス
-  from: string; // 送信者のユーザーID
-  to: string; // 受信者のユーザーID
-  room_id: string; // ルームID
 };
