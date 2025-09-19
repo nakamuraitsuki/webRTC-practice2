@@ -53,7 +53,7 @@ export const createSignalingUseCase = (
       const sdpPayload: SDPMessage = msg.payload;
       if (sdpPayload.sdp_type === 'offer') {
         // 受信したOfferに応答する
-        if( msg.payload.from == selfUserId ) {
+        if( msg.payload.from === selfUserId ) {
           // 自分からのOfferは無視
           return;
         }
