@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { SocketService } from "../../domains/services/socket/socketService"
+import { SocketService } from "../../domains/services/socketService";
 import { createSocketService } from "../../infrastructure/socket/socketServiceImpl";
 
 type SocketValue = {
