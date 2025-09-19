@@ -78,7 +78,7 @@ export const createSignalingUseCase = (
           return;
         }
         await rtc.applyRemoteAnswer(sdpPayload.sdp);
-      }else {
+      } else {
         throw new Error('Unknown SDP type');
       }
     },
