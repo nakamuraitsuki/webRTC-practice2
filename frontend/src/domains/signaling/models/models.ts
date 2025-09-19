@@ -1,8 +1,8 @@
 export type SDPMessage = {
   sdp_type: 'offer' | 'answer';
-  sdp: string; // SDPの内容
+  sdp: RTCSessionDescriptionInit; // SDPの内容
   from: string; // 送信者のユーザーID
-  to: string; // 受信者のユーザーID
+  to?: string; // 受信者のユーザーID
   room_id: string; // ルームID
 };
 
