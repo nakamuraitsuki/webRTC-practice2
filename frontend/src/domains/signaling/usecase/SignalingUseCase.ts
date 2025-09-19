@@ -71,7 +71,7 @@ export const createSignalingUseCase = (
         }
         // Answerの送信
         socket.send(answerMessage);
-      }else if (sdpPayload.sdp_type === 'answer') {
+      } else if (sdpPayload.sdp_type === 'answer') {
         // 受信したAnswerを適用する
         if( msg.payload.to != selfUserId ) {
           // 自分宛てのAnswerでなければ無視
