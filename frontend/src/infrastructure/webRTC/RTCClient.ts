@@ -3,18 +3,10 @@ export type IceCandidateCallback = (candidate: RTCIceCandidateInit) => void;
 export class RTCClient {
   private pc: RTCPeerConnection;
 
-  constructor(
-    private readonly config: RTCConfiguration,
-    private readonly onIceCandidate: IceCandidateCallback
-  ) {
-    this.pc = new RTCPeerConnection(this.config);
-
-    // ICE Candidate が生成されたらコールバック
-    this.pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.onIceCandidate(event.candidate.toJSON());
-      }
-    };
+  constructor() {
+    this.pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    });
   }
 
   // Offer を作成
@@ -45,5 +37,18 @@ export class RTCClient {
       console.error("Failed to add ICE candidate:", error, candidate);
       throw new Error("Failed to add ICE candidate: " + (error instanceof Error ? error.message : String(error)));
     }
+  }
+
+  // コールバックの追加
+  async addIceCandidateCallback(callback: IceCandidateCallback) {
+    this.pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        callback(event.candidate.toJSON());
+      }
+    };
+  }
+
+  async closeConnection() {
+    this.pc.close();
   }
 }
