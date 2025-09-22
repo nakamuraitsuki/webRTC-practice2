@@ -1,4 +1,4 @@
-import { SocketService } from "../../domains/services/socket/socketService";
+import { SocketService } from "../../domains/services/socketService";
 import { SocketClient } from "./socketClient";
 import { MessageTypeMap } from "../../domains/message/models/Message";
 
