@@ -15,9 +15,12 @@ export interface SignalingUseCase {
   // ルームから退出する
   leaveRoom: () => Promise<void>;
 
-  // オファー、アンサー、ICE候補の処理
+  // 送られてきたオファー、アンサー、ICE候補の処理
   handleSDP: (msg: Message<'sdp'>, selfUserId: string) => Promise<void>;
   handleICECandidate: (msg: Message<'ice'>) => Promise<void>;
+
+  // listenerに登録する用のsendICECandidate
+  sendICECandidate: (candidate: RTCIceCandidate) => void;
 }
 
 export const createSignalingUseCase = (
@@ -96,6 +99,12 @@ export const createSignalingUseCase = (
         sdpMid: icePayload.sdp_mid,
         sdpMLineIndex: icePayload.sdp_mline_index,
       });
-    }
+    },
+
+    /**
+     * listenerに登録する用のsendICECandidate。hook内で上書きして使う
+     * @param candidate RTCIceCandidate
+     */
+    sendICECandidate: (_candidate: RTCIceCandidate) => {}
   }
 }

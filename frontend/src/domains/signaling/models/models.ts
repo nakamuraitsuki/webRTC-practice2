@@ -11,6 +11,6 @@ export type ICEMessage = {
   sdp_mid: string; // SDPのメディア識別子
   sdp_mline_index: number; // SDPのメディア行インデックス
   from: string; // 送信者のユーザーID
-  to: string; // 受信者のユーザーID
+  to?: string; // 受信者のユーザーID
   room_id: string; // ルームID
 };
