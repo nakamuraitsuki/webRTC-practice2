@@ -40,7 +40,7 @@ export class RTCClient {
   }
 
   // コールバックの追加
-  async addIceCandidateCallback(callback: IceCandidateCallback) {
+  addIceCandidateCallback(callback: IceCandidateCallback) {
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
         callback(event.candidate.toJSON());
