@@ -53,7 +53,7 @@ export class RTCClient {
     this.pc.onicecandidate = null;
   }
 
-  async closeConnection() {
+  closeConnection() {
     this.pc.close();
   }
 }
