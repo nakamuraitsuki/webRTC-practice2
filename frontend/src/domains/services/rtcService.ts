@@ -1,3 +1,5 @@
+import { IceCandidateCallback } from "../../infrastructure/webRTC/RTCClient"
+
 export interface RTCService {
   /**
    * Offerを作成する
@@ -23,14 +25,20 @@ export interface RTCService {
    * @param candidate 受信したICE Candidate
    */
   addRemoteIceCandidate: (candidate: RTCIceCandidateInit) => Promise<void>
-  
-  /**
-   * 新しいICE Candidateが生成されたときのコールバックを登録する
-   * @param callback 新しいICE Candidateが生成されたときに呼ばれるコールバック
-   * @returns コールバックの登録を解除するための関数
-   */
-  onIceCandidate: (callback: (candidate: RTCIceCandidateInit) => void) => () => void
 
+  /**
+   * コールバックを追加する
+   * @param callback ICE Candidateが生成されたときに呼ばれるコールバック
+   */
+  addIceCandidateCallback: (callback: IceCandidateCallback) => void
+
+
+  /**
+   * 
+   * @returns コールバックを削除する
+   */
+  removeIceCandidateCallback: () => void
+  
   /**
    * 接続を終了する
    */
