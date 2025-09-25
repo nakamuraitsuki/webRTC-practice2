@@ -1,7 +1,7 @@
 import { Message } from "../../message/models/Message";
 import { RTCService } from "../../services/rtcService";
 import { SocketService } from "../../services/socketService";
-import { SDPMessage } from "../models/models";
+import { ICEMessage, SDPMessage } from "../models/models";
 
 export type JoinRoomInput = {
   room_id: string; // ルームID
@@ -16,8 +16,8 @@ export interface SignalingUseCase {
   leaveRoom: () => Promise<void>;
 
   // 送られてきたオファー、アンサー、ICE候補の処理
-  handleSDP: (msg: Message<'sdp'>, selfUserId: string) => Promise<void>;
-  handleICECandidate: (msg: Message<'ice'>) => Promise<void>;
+  handleSDP: (msg: SDPMessage, selfUserId: string) => Promise<void>;
+  handleICECandidate: (msg: ICEMessage) => Promise<void>;
 
   // listenerに登録する用のsendICECandidate
   sendICECandidate: (candidate: RTCIceCandidate) => void;
@@ -52,17 +52,16 @@ export const createSignalingUseCase = (
       socket.disconnect();
     },
 
-    handleSDP: async (msg: Message<'sdp'>, selfUserId: string): Promise<void> => {
-      const sdpPayload: SDPMessage = msg.payload;
-      if (sdpPayload.sdp_type === 'offer') {
+    handleSDP: async (msg: SDPMessage, selfUserId: string): Promise<void> => {
+      if (msg.sdp_type === 'offer') {
         // 受信したOfferに応答する
-        if( msg.payload.from === selfUserId ) {
+        if( msg.from === selfUserId ) {
           // 自分からのOfferは無視
           return;
         }
         const answer: RTCSessionDescriptionInit = await rtc.respondToOffer({
           type: 'offer',
-          sdp: sdpPayload.sdp,
+          sdp: msg.sdp,
         })
         // Answerの組み立て
         const answerMessage: Message<'sdp'> = {
@@ -71,33 +70,32 @@ export const createSignalingUseCase = (
             sdp_type: 'answer',
             sdp: answer.sdp || '',
             from: selfUserId,
-            to: sdpPayload.from,
-            room_id: sdpPayload.room_id,
+            to: msg.from,
+            room_id: msg.room_id,
           }
         }
         // Answerの送信
         socket.send(answerMessage);
-      } else if (sdpPayload.sdp_type === 'answer') {
+      } else if (msg.sdp_type === 'answer') {
         // 受信したAnswerを適用する
-        if( msg.payload.to !== selfUserId ) {
+        if( msg.to !== selfUserId ) {
           // 自分宛てのAnswerでなければ無視
           return;
         }
         await rtc.applyRemoteAnswer({
           type: 'answer',
-          sdp: sdpPayload.sdp || '',
+          sdp: msg.sdp || '',
         });
       } else {
         throw new Error('Unknown SDP type');
       }
     },
 
-    handleICECandidate: async (msg: Message<'ice'>): Promise<void> => {
-      const icePayload = msg.payload;
+    handleICECandidate: async (msg: ICEMessage): Promise<void> => {
       await rtc.addRemoteIceCandidate({
-        candidate: icePayload.candidate,
-        sdpMid: icePayload.sdp_mid,
-        sdpMLineIndex: icePayload.sdp_mline_index,
+        candidate: msg.candidate,
+        sdpMid: msg.sdp_mid,
+        sdpMLineIndex: msg.sdp_mline_index,
       });
     },
 
