@@ -103,6 +103,8 @@ export const createSignalingUseCase = (
      * listenerに登録する用のsendICECandidate。hook内で上書きして使う
      * @param candidate RTCIceCandidate
      */
-    sendICECandidate: (_candidate: RTCIceCandidate) => {}
+    sendICECandidate: (_candidate: RTCIceCandidate) => {
+      // No-op: This function is intentionally left blank and is expected to be overridden in a hook.
+    }
   }
 }
