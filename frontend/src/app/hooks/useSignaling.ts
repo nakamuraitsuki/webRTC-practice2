@@ -1,0 +1,56 @@
+import { useContext, useEffect } from "react";
+import { SignalingContext } from "../providers/SignalingProvider";
+import { SignalingUseCase } from "../../domains/signaling/usecase/SignalingUseCase";
+import { Message } from "../../domains/message/models/Message";
+import { SDPMessage } from "../../domains/signaling/models/models";
+import { IceCandidateCallback } from "../../infrastructure/webRTC/RTCClient";
+export const useSignaling = ({
+  userId,
+  roomId,
+}: {
+  userId: string;
+  roomId: string;
+}): SignalingUseCase => {
+  const context = useContext(SignalingContext);
+  if (!context) {
+    throw new Error("useSignaling must be used within a SignalingProvider");
+  }
+
+  // sendICECandidateをuserId, roomIdを含めてラップ
+  const usecase: SignalingUseCase = {
+    ...context.usecase,
+    sendICECandidate: (candidate) => {
+      // messageの組み立て
+      const message: Message<'ice'> = {
+        message_type: 'ice',
+        payload: {
+          candidate: candidate.candidate,
+          sdp_mid: candidate.sdpMid || '',
+          sdp_mline_index: candidate.sdpMLineIndex || 0,
+          from: userId,
+          room_id: roomId,
+        }
+      }
+
+      // 送信
+      context.socketService.send(message);
+    }
+  }
+
+  // listenerの登録
+  useEffect(() => {
+    context.socketService.onMessage('sdp', async (msg: SDPMessage) => {
+      await usecase.handleSDP(msg, userId);
+    });
+    context.socketService.onMessage('ice', context.usecase.handleICECandidate);
+    context.rtcService.addIceCandidateCallback(usecase.sendICECandidate as IceCandidateCallback);
+
+    return () => {
+      context.socketService.offMessage('sdp');
+      context.socketService.offMessage('ice');
+      context.rtcService.removeIceCandidateCallback();
+    }
+  }, [context, userId, roomId]);
+  
+  return usecase;
+}
