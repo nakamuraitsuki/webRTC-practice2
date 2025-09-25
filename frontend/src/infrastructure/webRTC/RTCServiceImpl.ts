@@ -9,6 +9,7 @@ export const createRTCService = (): RTCService => {
     applyRemoteAnswer: (answer) => rtcClient.setRemoteDescription(answer),
     addRemoteIceCandidate: (candidate) => rtcClient.addIceCandidate(candidate),
     addIceCandidateCallback: (callback) => rtcClient.addIceCandidateCallback(callback),
+    removeIceCandidateCallback: () => rtcClient.removeIceCandidateCallback(),
     closeConnection: () => rtcClient.closeConnection(),
   }
 }

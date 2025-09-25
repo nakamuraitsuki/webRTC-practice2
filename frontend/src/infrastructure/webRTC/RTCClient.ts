@@ -48,6 +48,11 @@ export class RTCClient {
     };
   }
 
+  // コールバックの削除
+  async removeIceCandidateCallback() {
+    this.pc.onicecandidate = null;
+  }
+
   async closeConnection() {
     this.pc.close();
   }

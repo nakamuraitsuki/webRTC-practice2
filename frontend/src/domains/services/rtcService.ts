@@ -32,6 +32,13 @@ export interface RTCService {
    */
   addIceCandidateCallback: (callback: IceCandidateCallback) => void
 
+
+  /**
+   * 
+   * @returns コールバックを削除する
+   */
+  removeIceCandidateCallback: () => void
+  
   /**
    * 接続を終了する
    */
