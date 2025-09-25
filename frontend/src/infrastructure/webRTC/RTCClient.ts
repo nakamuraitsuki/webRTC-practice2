@@ -49,7 +49,7 @@ export class RTCClient {
   }
 
   // コールバックの削除
-  async removeIceCandidateCallback() {
+  removeIceCandidateCallback() {
     this.pc.onicecandidate = null;
   }
 
