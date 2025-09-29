@@ -93,10 +93,9 @@ func (m *InMemoryWebSocketManager) GetConnectionsByRoomID(ctx context.Context, r
 	return userConnections, nil
 }
 
-func (m *InMemoryWebSocketManager) BroadcastToRoom(ctx context.Context, roomID entity.RoomID, msg *entity.Message) error {
+func (m *InMemoryWebSocketManager) BroadcastToRoom(ctx context.Context, roomID entity.RoomID, msgType service.MsgType, msg any) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	msgType := service.MsgTypeText
 
 	users, exists := m.connectionsByRoom[roomID]
 	if !exists {
