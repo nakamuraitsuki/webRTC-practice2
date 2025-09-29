@@ -39,5 +39,5 @@ type WebsocketManager interface {
 	GetConnectionsByRoomID(ctx context.Context, roomID entity.RoomID) ([]UserConnection, error)
 
 	// 指定した部屋にいるユーザーにメッセージをブロードキャスト
-	BroadcastToRoom(ctx context.Context, roomID entity.RoomID, msg *entity.Message) error
+	BroadcastToRoom(ctx context.Context, roomID entity.RoomID, msgType MsgType, msg any) error
 }

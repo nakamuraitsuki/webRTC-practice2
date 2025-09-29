@@ -5,17 +5,18 @@ import (
 	"time"
 
 	"example.com/infrahandson/internal/domain/entity"
+	"example.com/infrahandson/internal/domain/service"
 )
 
 // SendMessageRequest構造体: メッセージ送信リクエスト
-type SendMessageRequest struct {
+type SendTextRequest struct {
 	RoomID  entity.RoomID
 	Sender  entity.UserID
 	Content string
 }
 
 // SendMessage メッセージ送信
-func (w *WebsocketUseCase) SendMessage(ctx context.Context, req SendMessageRequest) error {
+func (w *WebsocketUseCase) SendTextMessage(ctx context.Context, req SendTextRequest) error {
 	id, err := w.msgIDFactory.NewMessageID()
 	if err != nil {
 		return err
@@ -37,10 +38,26 @@ func (w *WebsocketUseCase) SendMessage(ctx context.Context, req SendMessageReque
 		return err
 	}
 
-	err = w.websocketManager.BroadcastToRoom(ctx, req.RoomID, msg)
+	err = w.websocketManager.BroadcastToRoom(ctx, req.RoomID, service.MsgTypeText, msg)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (w *WebsocketUseCase) SendSDPMessage(ctx context.Context, sdpMsg *entity.SDPMessage) error {
+	err := w.websocketManager.BroadcastToRoom(ctx, sdpMsg.GetRoomID(), service.MsgTypeSDP, sdpMsg)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w *WebsocketUseCase) SendICECandidate(ctx context.Context, iceCandidate *entity.ICECandidate) error {
+	err := w.websocketManager.BroadcastToRoom(ctx, iceCandidate.GetRoomID(), service.MsgTypeICE, iceCandidate)
+	if err != nil {
+		return err
+	}
 	return nil
 }
