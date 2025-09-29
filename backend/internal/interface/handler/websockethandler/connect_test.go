@@ -54,7 +54,7 @@ func TestConnectToChatRoom(t *testing.T) {
 
 		gomock.InOrder(
 			mockConn.EXPECT().ReadMessage().Return(testMessage, nil),
-			mockDeps.WsUseCase.EXPECT().SendMessage(gomock.Any(), gomock.Any()).Return(nil),
+			mockDeps.WsUseCase.EXPECT().SendTextMessage(gomock.Any(), gomock.Any()).Return(nil),
 			mockConn.EXPECT().ReadMessage().Return(nil, assert.AnError),
 			mockDeps.Logger.EXPECT().Warn(gomock.Any(), gomock.Any()),
 			mockDeps.WsUseCase.EXPECT().DisconnectUser(gomock.Any(), gomock.Any()).DoAndReturn(func(_ context.Context, _ websocketcase.DisconnectUserRequest) error {
