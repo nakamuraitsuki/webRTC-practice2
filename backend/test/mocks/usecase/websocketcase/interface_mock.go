@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	entity "example.com/infrahandson/internal/domain/entity"
 	websocketcase "example.com/infrahandson/internal/usecase/websocketcase"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -67,6 +68,34 @@ func (m *MockWebsocketUseCaseInterface) DisconnectUser(ctx context.Context, req 
 func (mr *MockWebsocketUseCaseInterfaceMockRecorder) DisconnectUser(ctx, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DisconnectUser", reflect.TypeOf((*MockWebsocketUseCaseInterface)(nil).DisconnectUser), ctx, req)
+}
+
+// SendICECandidate mocks base method.
+func (m *MockWebsocketUseCaseInterface) SendICECandidate(ctx context.Context, iceCandidate *entity.ICECandidate) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendICECandidate", ctx, iceCandidate)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendICECandidate indicates an expected call of SendICECandidate.
+func (mr *MockWebsocketUseCaseInterfaceMockRecorder) SendICECandidate(ctx, iceCandidate any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendICECandidate", reflect.TypeOf((*MockWebsocketUseCaseInterface)(nil).SendICECandidate), ctx, iceCandidate)
+}
+
+// SendSDPMessage mocks base method.
+func (m *MockWebsocketUseCaseInterface) SendSDPMessage(ctx context.Context, sdpMsg *entity.SDPMessage) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendSDPMessage", ctx, sdpMsg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendSDPMessage indicates an expected call of SendSDPMessage.
+func (mr *MockWebsocketUseCaseInterfaceMockRecorder) SendSDPMessage(ctx, sdpMsg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendSDPMessage", reflect.TypeOf((*MockWebsocketUseCaseInterface)(nil).SendSDPMessage), ctx, sdpMsg)
 }
 
 // SendTextMessage mocks base method.
