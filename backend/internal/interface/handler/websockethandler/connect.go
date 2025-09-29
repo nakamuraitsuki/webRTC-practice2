@@ -71,6 +71,7 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 			}
 
 			// メッセージの型を確認
+			// Textメッセージのとき
 			if msgType == service.MsgTypeText {
 				h.Logger.Info("Message received", "room_public_id", roomID, "user_id", userID)
 
@@ -79,11 +80,43 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 					h.Logger.Error("Invalid message type received", "expected", "*entity.Message", "received", message)
 					continue
 				}
-				err = h.WsUseCase.SendMessage(wsCtx, websocketcase.SendMessageRequest{
+				err = h.WsUseCase.SendTextMessage(wsCtx, websocketcase.SendTextRequest{
 					RoomID:  entity.RoomID(roomID),
 					Sender:  entity.UserID(userID),
 					Content: messageEntity.GetContent(),
 				})
+				if err != nil {
+					h.Logger.Error("connection closed", err)
+					return
+				}
+			}
+
+			// SDPメッセージのとき
+			if msgType == service.MsgTypeSDP {
+				h.Logger.Info("SDP message received", "room_public_id", roomID, "user_id", userID)
+
+				sdpMessage, ok := message.(*entity.SDPMessage)
+				if !ok {
+					h.Logger.Error("Invalid SDP message type received", "expected", "*entity.SDPMessage", "received", message)
+					continue
+				}
+				err = h.WsUseCase.SendSDPMessage(wsCtx, sdpMessage)
+				if err != nil {
+					h.Logger.Error("connection closed", err)
+					return
+				}
+			} 
+
+			// ICEメッセージのとき
+			if msgType == service.MsgTypeICE {
+				h.Logger.Info("ICE message received", "room_public_id", roomID, "user_id", userID)
+
+				iceCandidate, ok := message.(*entity.ICECandidate)
+				if !ok {
+					h.Logger.Error("Invalid ICE message type received", "expected", "*entity.ICECandidate", "received", message)
+					continue
+				}
+				err = h.WsUseCase.SendICECandidate(wsCtx, iceCandidate)
 				if err != nil {
 					h.Logger.Error("connection closed", err)
 					return
