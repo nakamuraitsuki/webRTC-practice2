@@ -93,8 +93,7 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 
 			// SDPメッセージのとき
 			if msgType == service.MsgTypeSDP {
-				h.Logger.Info("SDP message received", "room_public_id", roomID, "user_id", userID)
-
+				h.Logger.Info("SDP message received", "room_public_id", roomID, "user_id", userID, "message", message)
 				sdpMessage, ok := message.(*entity.SDPMessage)
 				if !ok {
 					h.Logger.Error("Invalid SDP message type received", "expected", "*entity.SDPMessage", "received", message)
