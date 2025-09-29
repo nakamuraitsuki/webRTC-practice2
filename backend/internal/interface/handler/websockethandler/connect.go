@@ -105,7 +105,7 @@ func (h *WebSocketHandler) ConnectToChatRoom(c echo.Context) error {
 					h.Logger.Error("connection closed", err)
 					return
 				}
-			} 
+			}
 
 			// ICEメッセージのとき
 			if msgType == service.MsgTypeICE {
