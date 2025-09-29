@@ -13,6 +13,7 @@ export class RTCClient {
   async createOffer(): Promise<RTCSessionDescriptionInit> {
     const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
+    console.log("create offer", offer);
     return offer;
   }
 
@@ -21,11 +22,13 @@ export class RTCClient {
     await this.pc.setRemoteDescription(new RTCSessionDescription(remoteOffer));
     const answer = await this.pc.createAnswer();
     await this.pc.setLocalDescription(answer);
+    console.log("receive offer and sent answer", remoteOffer);
     return answer;
   }
 
   // Remote Description (Offer/Answer) を適用
   async setRemoteDescription(remoteDescription: RTCSessionDescriptionInit) {
+    console.log("set remote description", remoteDescription);
     await this.pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
   }
 
