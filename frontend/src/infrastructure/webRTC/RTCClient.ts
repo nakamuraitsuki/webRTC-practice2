@@ -35,6 +35,7 @@ export class RTCClient {
   // Remote ICE Candidate を追加
   async addIceCandidate(candidate: RTCIceCandidateInit) {
     try {
+      console.log("add ICE candidate", candidate);
       await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
       console.error("Failed to add ICE candidate:", error, candidate);
@@ -46,6 +47,7 @@ export class RTCClient {
   addIceCandidateCallback(callback: IceCandidateCallback) {
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log("new ICE candidate", event.candidate);
         callback(event.candidate.toJSON());
       }
     };
