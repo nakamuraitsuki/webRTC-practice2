@@ -2,11 +2,52 @@ export type IceCandidateCallback = (candidate: RTCIceCandidateInit) => void;
 
 export class RTCClient {
   private pc: RTCPeerConnection;
+  private dataChannel?: RTCDataChannel;
 
   constructor() {
     this.pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
     });
+  }
+
+  // Data Channel の作成
+  createDataChannel(label: string = "data") {
+    this.dataChannel = this.pc.createDataChannel(label);
+    this.dataChannel.onopen = () => {
+      console.log("Data channel is open");
+    };
+    this.dataChannel.onmessage = (event) => {
+      console.log("Received message:", event.data);
+    };
+    this.dataChannel.onclose = () => {
+      console.log("Data channel is closed");
+    };
+  }
+
+  onDataChannel(callback: (channel: RTCDataChannel) => void) {
+    this.pc.ondatachannel = (event) => {
+      console.log("Data channel received");
+      this.dataChannel = event.channel;
+      this.dataChannel.onopen = () => {
+        console.log("Data channel is open");
+      };
+      this.dataChannel.onmessage = (event) => {
+        console.log("Received message:", event.data);
+      };
+      this.dataChannel.onclose = () => {
+        console.log("Data channel is closed");
+      };
+      callback(this.dataChannel);
+    };
+  }
+
+  sendData(data: string) {
+    if (this.dataChannel && this.dataChannel.readyState === "open") {
+      this.dataChannel.send(data);
+      console.log("Sent message:", data);
+    } else {
+      console.warn("Data channel is not open. Cannot send message.");
+    }
   }
 
   // Offer を作成
@@ -57,6 +98,18 @@ export class RTCClient {
   removeIceCandidateCallback() {
     this.pc.onicecandidate = null;
   }
+
+  async addLocalStream(): Promise<MediaStream | null> {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      stream.getTracks().forEach(track => this.pc.addTrack(track, stream));
+      return stream;
+    } catch (err) {
+      console.error("Failed to get local media:", err);
+      return null;
+    }
+  }
+
 
   closeConnection() {
     this.pc.close();
