@@ -7,12 +7,13 @@ import (
 )
 
 // NOTE: UserIDなどは、string型をラップしているだけなので、Jsonパースに含めて問題ない
+// NOTE: manufacture をつけるとうまくいかないのでつけない
 type TextMessageDTO struct {
-	ID      entity.MessageID `json:"id"      mapstructure:"id"`
-	RoomID  entity.RoomID    `json:"room_id" mapstructure:"room_id"`
-	UserID  entity.UserID    `json:"user_id" mapstructure:"user_id"`
-	Content string           `json:"content" mapstructure:"content"`
-	SentAt  time.Time        `json:"sent_at" mapstructure:"sent_at"`
+	ID      entity.MessageID `json:"id"`
+	RoomID  entity.RoomID    `json:"room_id"`
+	UserID  entity.UserID    `json:"user_id"`
+	Content string           `json:"content"`
+	SentAt  time.Time        `json:"sent_at"`
 }
 
 func (m *TextMessageDTO) ToEntity() *entity.Message {
