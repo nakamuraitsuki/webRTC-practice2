@@ -13,7 +13,7 @@ export interface SignalingUseCase {
   joinRoom: (input: JoinRoomInput) => Promise<void>;
 
   // ルームから退出する
-  leaveRoom: () => Promise<void>;
+  leaveRoom: () => void;
 
   // 送られてきたオファー、アンサー、ICE候補の処理
   handleSDP: (msg: SDPMessage, selfUserId: string) => Promise<void>;
@@ -45,6 +45,7 @@ export const createSignalingUseCase = (
 
       // offerの送信
       socket.send(message);
+      console.log("Sent offer", message);
     },
 
     leaveRoom: async (): Promise<void> => {
@@ -53,6 +54,7 @@ export const createSignalingUseCase = (
     },
 
     handleSDP: async (msg: SDPMessage, selfUserId: string): Promise<void> => {
+      console.log("Received SDP", msg);
       if (msg.sdp_type === 'offer') {
         // 受信したOfferに応答する
         if( msg.from === selfUserId ) {
