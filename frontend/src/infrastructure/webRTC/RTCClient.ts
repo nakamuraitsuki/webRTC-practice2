@@ -13,6 +13,7 @@ export class RTCClient {
   async createOffer(): Promise<RTCSessionDescriptionInit> {
     const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
+    console.log("create offer", offer);
     return offer;
   }
 
@@ -21,17 +22,20 @@ export class RTCClient {
     await this.pc.setRemoteDescription(new RTCSessionDescription(remoteOffer));
     const answer = await this.pc.createAnswer();
     await this.pc.setLocalDescription(answer);
+    console.log("receive offer and sent answer", remoteOffer);
     return answer;
   }
 
   // Remote Description (Offer/Answer) を適用
   async setRemoteDescription(remoteDescription: RTCSessionDescriptionInit) {
+    console.log("set remote description", remoteDescription);
     await this.pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
   }
 
   // Remote ICE Candidate を追加
   async addIceCandidate(candidate: RTCIceCandidateInit) {
     try {
+      console.log("add ICE candidate", candidate);
       await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
       console.error("Failed to add ICE candidate:", error, candidate);
@@ -43,6 +47,7 @@ export class RTCClient {
   addIceCandidateCallback(callback: IceCandidateCallback) {
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log("new ICE candidate", event.candidate);
         callback(event.candidate.toJSON());
       }
     };

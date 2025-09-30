@@ -2,6 +2,7 @@ package gorillawebsocket
 
 import (
 	"errors"
+	"fmt"
 
 	"example.com/infrahandson/internal/domain/entity"
 	"example.com/infrahandson/internal/domain/service"
@@ -49,6 +50,8 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 		return "", nil, err
 	}
 
+	fmt.Printf("Received message: %+v\n", msgDTO)
+
 	// payload の型不定を解消しにかかる
 	// とりあえず map[string]any として扱う
 	rawMap, ok := msgDTO.Payload.(map[string]any)
@@ -82,9 +85,10 @@ func (c *GorillaWebSocketConnection) ReadMessage() (service.MsgType, any, error)
 			return "", nil, err
 		}
 		
+		fmt.Printf("Decoded SDPMessageDTO: %+v\n", sdpMsgDTO)
 		// SDPMessageDTO から entity.SDPMessage に変換
 		sdpMessage, err := sdpMsgDTO.ToEntity()
-		if err == nil {
+		if err != nil {
 			return "", nil, errors.New("failed to convert SDPMessageDTO to entity.SDPMessage")
 		}
 

@@ -19,26 +19,58 @@ export class SocketClient {
     this.url = this.baseUrl+ endpoint;
   }
 
+  isConnected(): boolean {
+    return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
+  }
+
   connect() {
-    if (this.socket) {
-      console.warn("WebSocket is already connected.");
-      return;
+    // すでに接続されている場合は何もしない
+    if ( this.socket && this.socket.readyState === WebSocket.OPEN ) {
+      return Promise.resolve();
+    } 
+
+    // 新しいWebSocket接続を作成 + 接続成功後の処理登録
+    return new Promise<void>((resolve, reject) => {
+      this.socket = new WebSocket(this.url);
+      
+      // 接続成功・失敗のハンドリング
+      this.socket.onopen = () => {
+        console.log("WebSocket connected");
+
+        // メッセージ受信処理をここで登録
+        this.socket!.onmessage = (event) => {
+          try {
+            console.log("WebSocket message received:", event.data);
+            const parsed = JSON.parse(event.data);
+            const message = parsed as Message;
+            const handler = this.listeners.get(message.message_type);
+            handler?.(message.payload);
+          } catch (e) {
+            console.error("Failed to parse WebSocket message:", e);
+          }
+        };
+
+        resolve();
+      };
+
+      this.socket.onerror = (err) => {
+        console.error("WebSocket error:", err);
+        reject(err);
+      };
+
+      this.socket.onclose = () => {
+        console.log("WebSocket disconnected");
+        this.socket = null;
+      };
+    });
+  }
+  
+  disconnect() {
+    if (!this.socket) return;
+    if ( this.socket.readyState === WebSocket.OPEN) {
+      this.socket.close();
     }
-    
-    this.socket = new WebSocket(this.url);
-
-    // 生成したSocketに対してイベントリスナーを設定
-    this.socket.onmessage = (event) => {
-      // JSONパース
-      const parsed = JSON.parse(event.data);
-      // 必ず汎用型で送られてくる
-      const message = parsed as Message;
-      // 対応ハンドラをMapから取得
-      const handler = this.listeners.get(message.message_type);
-      // ペイロードを受け渡し
-      handler?.(message.payload);
-    };
-
+    this.socket = null;
   }
 
   // イベントリスナーを登録
@@ -69,12 +101,5 @@ export class SocketClient {
     }
     // JSON形式で送る
     this.socket.send(JSON.stringify(data));
-  }
-
-  disconnect() {
-    if (!this.socket) return;
-
-    this.socket.close();
-    this.socket = null;
   }
 }

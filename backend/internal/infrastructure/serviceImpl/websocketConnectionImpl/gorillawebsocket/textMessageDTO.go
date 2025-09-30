@@ -7,6 +7,7 @@ import (
 )
 
 // NOTE: UserIDなどは、string型をラップしているだけなので、Jsonパースに含めて問題ない
+// NOTE: manufacture をつけるとうまくいかないのでつけない
 type TextMessageDTO struct {
 	ID      entity.MessageID `json:"id"`
 	RoomID  entity.RoomID    `json:"room_id"`

@@ -3,12 +3,12 @@ package gorillawebsocket
 import "example.com/infrahandson/internal/domain/entity"
 
 type IceCandidateDTO struct {
-	Candidate     string        `json:"candidate"`       // ICE候補の文字列
-	SdpMid        string        `json:"sdp_mid"`         // SDPのメディア識別子
-	SdpMLineIndex uint16        `json:"sdp_mline_index"` // SDPのメディア行インデックス
-	From          entity.UserID `json:"from"`            // 送信者のユーザーID
-	To            entity.UserID `json:"to"`              // 受信者のユーザーID
-	RoomID        entity.RoomID `json:"room_id"`         // ルームID
+	Candidate     string        `json:"candidate"       mapstructure:"candidate"`       // ICE候補の文字列
+	SdpMid        string        `json:"sdp_mid"         mapstructure:"sdp_mid"`         // SDPのメディア識別子
+	SdpMLineIndex uint16        `json:"sdp_mline_index" mapstructure:"sdp_mline_index"` // SDPのメディア行インデックス
+	From          entity.UserID `json:"from"            mapstructure:"from"`            // 送信者のユーザーID
+	To            entity.UserID `json:"to"              mapstructure:"to"`              // 受信者のユーザーID
+	RoomID        entity.RoomID `json:"room_id"         mapstructure:"room_id"`         // ルームID
 }
 
 func (dto *IceCandidateDTO) ToEntity() (*entity.ICECandidate, error) {
@@ -20,7 +20,7 @@ func (dto *IceCandidateDTO) ToEntity() (*entity.ICECandidate, error) {
 		To:            dto.To,
 		RoomID:        dto.RoomID,
 	}
-	
+
 	return entity.NewICECandidate(input)
 }
 

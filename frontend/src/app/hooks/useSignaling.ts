@@ -45,10 +45,13 @@ export const useSignaling = ({
     context.socketService.onMessage('ice', context.usecase.handleICECandidate);
     context.rtcService.addIceCandidateCallback(usecase.sendICECandidate as IceCandidateCallback);
 
+    console.log("Signaling listeners registered");
+
     return () => {
       context.socketService.offMessage('sdp');
       context.socketService.offMessage('ice');
       context.rtcService.removeIceCandidateCallback();
+      console.log("Signaling listeners unregistered");
     }
   }, [context, userId, roomId]);
   
