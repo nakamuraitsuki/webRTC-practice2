@@ -25,7 +25,7 @@ export const SocketProvider = ({
         console.error("WebSocket connection failed:", err);
       });
     
-    return () => socket?.disconnect();
+    return () => newSocket.disconnect();
   }, [roomId]);
 
   if( socket === null ) {
