@@ -41,13 +41,22 @@ export class RTCClient {
     };
   }
 
-  sendData(data: string) {
+  sendData(_label: string, data: string) {
     if (this.dataChannel && this.dataChannel.readyState === "open") {
       this.dataChannel.send(data);
       console.log("Sent message:", data);
     } else {
       console.warn("Data channel is not open. Cannot send message.");
     }
+  }
+
+  onData(_label: string, callback: (data: any) => void) {
+    const channel = this.dataChannel;
+    if (!channel) {
+      console.warn(`DataChannel not found`);
+      return;
+    }
+    channel.onmessage = (event) => callback(event.data);
   }
 
   /**
@@ -116,7 +125,6 @@ export class RTCClient {
       return null;
     }
   }
-
 
   closeConnection() {
     this.pc.close();
