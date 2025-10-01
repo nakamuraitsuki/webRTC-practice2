@@ -5,7 +5,7 @@ export interface RTCService {
    * Offerを作成する
    * @returns OfferのSDP
    */
-  createOffer: () => Promise<RTCSessionDescriptionInit>
+  createOffer: (options?: { withDataChannel?: boolean }) => Promise<RTCSessionDescriptionInit>
 
   /**
    * 受信したOfferに応答する

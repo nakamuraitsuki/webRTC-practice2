@@ -50,8 +50,15 @@ export class RTCClient {
     }
   }
 
-  // Offer を作成
-  async createOffer(): Promise<RTCSessionDescriptionInit> {
+  /**
+   * offer を作成
+   * @param options { withDataChannel?: boolean } - if true, create a DataChannel
+   * @returns offer 
+   */
+  async createOffer(options?: { withDataChannel?: boolean }): Promise<RTCSessionDescriptionInit> {
+    if ( options?.withDataChannel ) {
+      this.createDataChannel();
+    }
     const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
     console.log("create offer", offer);

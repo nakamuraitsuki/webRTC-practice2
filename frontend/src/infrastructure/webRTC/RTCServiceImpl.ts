@@ -4,7 +4,7 @@ import { RTCClient } from "./RTCClient";
 export const createRTCService = (): RTCService => {
   const rtcClient = new RTCClient();
   return {
-    createOffer: () => rtcClient.createOffer(),
+    createOffer: (options?: { withDataChannel?: boolean }) => rtcClient.createOffer(options),
     respondToOffer: (offer) => rtcClient.createAnswer(offer),
     applyRemoteAnswer: (answer) => rtcClient.setRemoteDescription(answer),
     addRemoteIceCandidate: (candidate) => rtcClient.addIceCandidate(candidate),
