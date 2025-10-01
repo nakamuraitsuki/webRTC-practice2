@@ -42,6 +42,8 @@ export interface RTCService {
   sendData: (label: string, data: string) => void
 
   onData: (label: string, callback: (data: any) => void) => void
+
+  initLocalStream: () => Promise<MediaStream | null>
   
   /**
    * 接続を終了する

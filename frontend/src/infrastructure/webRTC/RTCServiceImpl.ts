@@ -12,6 +12,7 @@ export const createRTCService = (): RTCService => {
     removeIceCandidateCallback: () => rtcClient.removeIceCandidateCallback(),
     sendData: (label, data) => rtcClient.sendData(label, data),
     onData: (label, callback) => rtcClient.onData(label, callback),
+    initLocalStream: () => rtcClient.addLocalStream(),
     closeConnection: () => rtcClient.closeConnection(),
   }
 }
