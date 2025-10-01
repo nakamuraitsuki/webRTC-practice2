@@ -39,10 +39,6 @@ export interface RTCService {
    */
   removeIceCandidateCallback: () => void
 
-  sendData: (label: string, data: string) => void
-
-  onData: (label: string, callback: (data: any) => void) => void
-
   initLocalStream: () => Promise<MediaStream | null>
   
   /**

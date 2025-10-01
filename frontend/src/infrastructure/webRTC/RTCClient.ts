@@ -41,24 +41,6 @@ export class RTCClient {
     };
   }
 
-  sendData(_label: string, data: string) {
-    if (this.dataChannel && this.dataChannel.readyState === "open") {
-      this.dataChannel.send(data);
-      console.log("Sent message:", data);
-    } else {
-      console.warn("Data channel is not open. Cannot send message.");
-    }
-  }
-
-  onData(_label: string, callback: (data: any) => void) {
-    const channel = this.dataChannel;
-    if (!channel) {
-      console.warn(`DataChannel not found`);
-      return;
-    }
-    channel.onmessage = (event) => callback(event.data);
-  }
-
   /**
    * offer を作成
    * @param options { withDataChannel?: boolean } - if true, create a DataChannel
@@ -117,8 +99,26 @@ export class RTCClient {
 
   async addLocalStream(): Promise<MediaStream | null> {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      // デバイスを確認する
+      const devices = await navigator.mediaDevices.enumerateDevices();
+
+      const hasVideoInput = devices.some( d => d.kind === 'videoinput' );
+      const hasAudioInput = devices.some( d => d.kind === 'audioinput' );
+
+      const constraints: MediaStreamConstraints = {
+        video: hasVideoInput ? { width: 1280, height: 720 } : false,
+        audio: hasAudioInput ? true : false,
+      };
+
+      if ( !hasVideoInput && !hasAudioInput ) {
+        console.warn("No media input devices found.");
+        return null;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
       stream.getTracks().forEach(track => this.pc.addTrack(track, stream));
+
       return stream;
     } catch (err) {
       console.error("Failed to get local media:", err);
