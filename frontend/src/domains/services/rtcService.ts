@@ -38,6 +38,10 @@ export interface RTCService {
    * @returns コールバックを削除する
    */
   removeIceCandidateCallback: () => void
+
+  sendData: (label: string, data: string) => void
+
+  onData: (label: string, callback: (data: any) => void) => void
   
   /**
    * 接続を終了する

@@ -10,6 +10,8 @@ export const createRTCService = (): RTCService => {
     addRemoteIceCandidate: (candidate) => rtcClient.addIceCandidate(candidate),
     addIceCandidateCallback: (callback) => rtcClient.addIceCandidateCallback(callback),
     removeIceCandidateCallback: () => rtcClient.removeIceCandidateCallback(),
+    sendData: (label, data) => rtcClient.sendData(label, data),
+    onData: (label, callback) => rtcClient.onData(label, callback),
     closeConnection: () => rtcClient.closeConnection(),
   }
 }
