@@ -1,13 +1,24 @@
 export type IceCandidateCallback = (candidate: RTCIceCandidateInit) => void;
 
 export class RTCClient {
+  // 本体
   private pc: RTCPeerConnection;
+  // データチャネル
   private dataChannel?: RTCDataChannel;
+
+  // ICE Candidate 一時保存用
+  private pendingCandidates: RTCIceCandidateInit[] = [];
+  private remoteDescriptionSet: boolean = false;
 
   constructor() {
     this.pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
     });
+  }
+
+  // pendingCandidates の getter
+  get iceCandidates(): ReadonlyArray<RTCIceCandidateInit> {
+    return this.pendingCandidates;
   }
 
   // Data Channel の作成
@@ -41,6 +52,13 @@ export class RTCClient {
     };
   }
 
+  onTrack(callback: (event: RTCTrackEvent) => void) {
+    this.pc.ontrack = (event) => {
+      console.log("Track event:", event);
+      callback(event);
+    };
+  }
+
   /**
    * offer を作成
    * @param options { withDataChannel?: boolean } - if true, create a DataChannel
@@ -67,19 +85,23 @@ export class RTCClient {
 
   // Remote Description (Offer/Answer) を適用
   async setRemoteDescription(remoteDescription: RTCSessionDescriptionInit) {
-    console.log("set remote description", remoteDescription);
     await this.pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
-  }
+    this.remoteDescriptionSet = true;
 
+    // キューに溜まった candidate を追加
+    for (const c of this.pendingCandidates) {
+      await this.pc.addIceCandidate(new RTCIceCandidate(c));
+    }
+    this.pendingCandidates = [];
+  }
   // Remote ICE Candidate を追加
   async addIceCandidate(candidate: RTCIceCandidateInit) {
-    try {
-      console.log("add ICE candidate", candidate);
-      await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
-    } catch (error) {
-      console.error("Failed to add ICE candidate:", error, candidate);
-      throw new Error("Failed to add ICE candidate: " + (error instanceof Error ? error.message : String(error)));
+    console.log("add ICE candidate", candidate);
+    if (!this.remoteDescriptionSet) {
+      this.pendingCandidates.push(candidate);
+      return;
     }
+    await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
   }
 
   // コールバックの追加
@@ -107,7 +129,7 @@ export class RTCClient {
 
       const constraints: MediaStreamConstraints = {
         video: hasVideoInput ? { width: 1280, height: 720 } : false,
-        audio: hasAudioInput ? true : false,
+         audio: hasAudioInput ? true: false,
       };
 
       if ( !hasVideoInput && !hasAudioInput ) {

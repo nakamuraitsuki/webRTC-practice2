@@ -17,10 +17,10 @@ export interface SignalingUseCase {
 
   // 送られてきたオファー、アンサー、ICE候補の処理
   handleSDP: (msg: SDPMessage, selfUserId: string) => Promise<void>;
-  handleICECandidate: (msg: ICEMessage) => Promise<void>;
+  handleICECandidate: (msg: ICEMessage, selfUserId: string) => Promise<void>;
 
   // listenerに登録する用のsendICECandidate
-  sendICECandidate: (candidate: RTCIceCandidate) => void;
+  sendICECandidate: (candidate: RTCIceCandidateInit) => void;
 }
 
 export const createSignalingUseCase = (
@@ -93,7 +93,11 @@ export const createSignalingUseCase = (
       }
     },
 
-    handleICECandidate: async (msg: ICEMessage): Promise<void> => {
+    handleICECandidate: async (msg: ICEMessage, selfUserId: string): Promise<void> => {
+      if( msg.from === selfUserId ) {
+        // 自分からのICEは無視
+        return;
+      }
       await rtc.addRemoteIceCandidate({
         candidate: msg.candidate,
         sdpMid: msg.sdp_mid,
@@ -105,7 +109,7 @@ export const createSignalingUseCase = (
      * listenerに登録する用のsendICECandidate。hook内で上書きして使う
      * @param candidate RTCIceCandidate
      */
-    sendICECandidate: (_candidate: RTCIceCandidate) => {
+    sendICECandidate: (_candidate: RTCIceCandidateInit) => {
       // No-op: This function is intentionally left blank and is expected to be overridden in a hook.
     }
   }
