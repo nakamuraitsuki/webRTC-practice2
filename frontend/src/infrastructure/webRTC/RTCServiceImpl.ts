@@ -4,6 +4,7 @@ import { RTCClient } from "./RTCClient";
 export const createRTCService = (): RTCService => {
   const rtcClient = new RTCClient();
   return {
+    getLocalIceCandidates: () => rtcClient.iceCandidates,
     createOffer: (options?: { withDataChannel?: boolean }) => rtcClient.createOffer(options),
     respondToOffer: (offer) => rtcClient.createAnswer(offer),
     applyRemoteAnswer: (answer) => rtcClient.setRemoteDescription(answer),
@@ -11,6 +12,7 @@ export const createRTCService = (): RTCService => {
     addIceCandidateCallback: (callback) => rtcClient.addIceCandidateCallback(callback),
     removeIceCandidateCallback: () => rtcClient.removeIceCandidateCallback(),
     initLocalStream: () => rtcClient.addLocalStream(),
+    onTrack: (callback) => rtcClient.onTrack(callback),
     closeConnection: () => rtcClient.closeConnection(),
   }
 }

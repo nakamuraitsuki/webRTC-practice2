@@ -1,6 +1,7 @@
 import { IceCandidateCallback } from "../../infrastructure/webRTC/RTCClient"
 
 export interface RTCService {
+  getLocalIceCandidates: () => ReadonlyArray<RTCIceCandidateInit>;
   /**
    * Offerを作成する
    * @returns OfferのSDP
@@ -40,6 +41,8 @@ export interface RTCService {
   removeIceCandidateCallback: () => void
 
   initLocalStream: () => Promise<MediaStream | null>
+
+  onTrack: (callback: (event: RTCTrackEvent) => void) => void
   
   /**
    * 接続を終了する
