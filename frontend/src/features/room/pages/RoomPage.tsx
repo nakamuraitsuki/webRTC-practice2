@@ -10,6 +10,8 @@ import { MessageList, MessageListProps } from '../components/MessageList';
 import { RTCProvider } from '../../../app/providers/RTCProvider';
 import { SignalingProvider } from '../../../app/providers/SignalingProvider';
 import { useSignaling } from '../../../app/hooks/useSignaling';
+import { DataChannelProvider } from '../../../app/providers/DataChannelProvider';
+import { useDataChannel } from '../../../app/hooks/useDataChannel';
 
 type RoomContentProps = {
   roomId: string;
@@ -36,26 +38,51 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const [hasNext, setHasNext] = useState(true);
   const [beforeSentAt, setBeforeSentAt] = useState(new Date().toISOString());
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
+  const DataChannel = useDataChannel();
+
+  // debug
+  const [remoteAudioActive, setRemoteAudioActive] = useState(false);
 
   useEffect(() => {
-    const input = {
-      roomId: roomId || '',
-      limit: 10,
-      beforeSentAt,
-    };
+    const setup = async () => {
+      await DataChannel.initLocalStream();
 
-    // ルームに参加
-    SignalingUseCase.joinRoom({ room_id: roomId, user_id: user?.id || '' });
-    console.log("Joined room:", roomId);
+      let remoteAudioEl: HTMLAudioElement | null = null;
 
-    usecase.history.getMessageHistory(input)
-      .then((res) => {
+      DataChannel.onTrack((event) => {
+        const remoteStream = event.streams[0];
+        if (!remoteAudioEl) {
+          remoteAudioEl = document.createElement("audio");
+          remoteAudioEl.autoplay = true;
+          document.body.appendChild(remoteAudioEl);
+        }
+        remoteAudioEl.srcObject = remoteStream;
+      });
+
+
+      await SignalingUseCase.joinRoom({ room_id: roomId, user_id: user?.id || '' });
+      console.log("Joined room:", roomId);
+
+      const input = {
+        roomId: roomId || '',
+        limit: 10,
+        beforeSentAt,
+      };
+
+      try {
+        const res = await usecase.history.getMessageHistory(input);
         setHasNext(res.data.hasNext);
         setBeforeSentAt(res.data.nextBeforeSentAt);
-      })
-      .catch(() => {
+      } catch {
         setHasNext(false);
-      });
+      }
+    }
+
+    setup();
+
+    return () => {
+      // SignalingUseCase.leaveRoom();
+    }
   }, [roomId])
 
   const onSubmit = handleSubmit((data) => {
@@ -79,6 +106,12 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
 
   return (
     <div>
+      {/* デバッグ用: 音声が来ているときだけ表示 */}
+      {remoteAudioActive && (
+        <div style={{ color: "red", fontWeight: "bold" }}>
+          🎤 音声受信中...
+        </div>
+      )}
       <ChatForm {...chatProps} />
       <MessageList {...messageListProps}/>
     </div>
@@ -96,7 +129,9 @@ export const RoomPage = () => {
       <RTCProvider>
         <SignalingProvider>
           <TextMessageProvider>
-            <RoomContent roomId={roomId} />
+            <DataChannelProvider>
+              <RoomContent roomId={roomId} />
+            </DataChannelProvider>
           </TextMessageProvider>
         </SignalingProvider>
       </RTCProvider>
