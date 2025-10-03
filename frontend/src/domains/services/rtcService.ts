@@ -1,11 +1,12 @@
 import { IceCandidateCallback } from "../../infrastructure/webRTC/RTCClient"
 
 export interface RTCService {
+  getLocalIceCandidates: () => ReadonlyArray<RTCIceCandidateInit>;
   /**
    * Offerを作成する
    * @returns OfferのSDP
    */
-  createOffer: () => Promise<RTCSessionDescriptionInit>
+  createOffer: (options?: { withDataChannel?: boolean }) => Promise<RTCSessionDescriptionInit>
 
   /**
    * 受信したOfferに応答する
@@ -38,6 +39,10 @@ export interface RTCService {
    * @returns コールバックを削除する
    */
   removeIceCandidateCallback: () => void
+
+  initLocalStream: () => Promise<MediaStream | null>
+
+  onTrack: (callback: (event: RTCTrackEvent) => void) => void
   
   /**
    * 接続を終了する

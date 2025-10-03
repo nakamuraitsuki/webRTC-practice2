@@ -32,9 +32,6 @@ func (i *ICECandidateInput) Validate() error {
 	if i.From == "" {
 		return errors.New("iceCandidateInput: From is required")
 	}
-	if i.To == "" {
-		return errors.New("iceCandidateInput: To is required")
-	}
 	if i.RoomID == "" {
 		return errors.New("iceCandidateInput: RoomID is required")
 	}
