@@ -1,7 +1,7 @@
 import { createContext, useEffect, useMemo, useRef, useState } from "react";
 import { TextMessage } from "../../domains/TextMessage/models/TextMessage";
 import { TextMessageHistoryUseCase } from "../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
-import { createTextMessageHistoryUseCase } from "../../domains/message/usecase/TextMessageHistoryUseCase";
+import { createTextMessageHistoryUseCase } from "../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
 import { createTextMessageHistoryRepository } from "../../infrastructure/api/TextMessageHistoryRepositoryImpl";
 import { useSocket } from "../hooks/useSocket";
 import { createTextMessageLiveUseCase, TextMessageLiveUseCase } from "../../domains/TextMessage/usecase/TextMessageLiveUseCase";
@@ -19,11 +19,15 @@ export const TextMessageContext = createContext<TextMessageContextValue | undefi
 export const TextMessageProvider = ({ children }: { children: React.ReactNode }) => {
   const [comments, setComments] = useState<TextMessage[]>([]);
   const seenIdsRef = useRef<Set<string>>(new Set());
-  const socketService  = useSocket();
+  const socket = useSocket();
 
+  if (socket === null) {
+    return <div>Loading...</div>;
+  }
+  
   const textMessageHistoryRepo = createTextMessageHistoryRepository();
   const textMessageHistoryUseCase = createTextMessageHistoryUseCase(textMessageHistoryRepo);
-  const textMessageLiveUseCase = createTextMessageLiveUseCase(socketService);
+  const textMessageLiveUseCase = createTextMessageLiveUseCase(socket);
 
   // UseCaseがステートに関われるようにラップ（useMemoで安定化）
   const usecase = useMemo(() => ({
@@ -69,12 +73,12 @@ export const TextMessageProvider = ({ children }: { children: React.ReactNode })
 
   // ソケットのメッセージ受信イベントを登録（render時に一度だけ）
   useEffect(() => {
-    socketService.onMessage("text", usecase.live.receiveMessage);
+    socket.onMessage("text", usecase.live.receiveMessage);
 
     return () => {
-      socketService.offMessage("text");
+      socket.offMessage("text");
     };
-  }, [socketService]);
+  }, [socket]);
 
   return (
     <TextMessageContext.Provider value={{ comments, usecase: usecase }}>

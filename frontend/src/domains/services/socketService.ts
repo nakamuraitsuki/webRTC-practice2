@@ -1,9 +1,10 @@
 // Socket通信の抽象化インターフェース
 
-import { Message, MessageTypeMap } from "../../message/models/Message";
+import { Message, MessageTypeMap } from "../message/models/Message";
 
 export interface SocketService {
-  connect(): void; // 接続開始
+  isConnected(): boolean; // 接続状態の確認
+  connect(): Promise<void>; // 接続開始
   disconnect(): void; // 接続終了
   send(message: Message): void; // メッセージ送信
   onMessage<T extends keyof MessageTypeMap>(

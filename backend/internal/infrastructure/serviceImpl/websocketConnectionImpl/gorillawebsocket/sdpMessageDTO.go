@@ -5,11 +5,11 @@ import (
 )
 
 type SDPMessageDTO struct {
-	SDPType entity.SDPType `json:"sdp_type"` // "offer" or "answer"
-	Sdp     string         `json:"sdp"`
-	From    entity.UserID  `json:"from"`
-	To      entity.UserID  `json:"to"`
-	RoomID  entity.RoomID  `json:"room_id"`
+	SDPType entity.SDPType `json:"sdp_type" mapstructure:"sdp_type"`
+	Sdp     string         `json:"sdp"      mapstructure:"sdp"`
+	From    entity.UserID  `json:"from"     mapstructure:"from"`
+	To      entity.UserID  `json:"to"       mapstructure:"to"`
+	RoomID  entity.RoomID  `json:"room_id"  mapstructure:"room_id"`
 }
 
 func (m *SDPMessageDTO) ToEntity() (*entity.SDPMessage, error) {

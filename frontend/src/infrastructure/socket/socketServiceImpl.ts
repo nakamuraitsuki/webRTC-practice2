@@ -1,11 +1,12 @@
-import { SocketService } from "../../domains/services/socket/socketService";
+import { SocketService } from "../../domains/services/socketService";
 import { SocketClient } from "./socketClient";
 import { MessageTypeMap } from "../../domains/message/models/Message";
 
 export const createSocketService = (endpoint: string): SocketService => {
   const socketClient = new SocketClient("/api/ws" + endpoint);
   return {
-    connect: () => socketClient.connect(),
+    isConnected: () => socketClient.isConnected(),
+    connect: async () => socketClient.connect(),
     disconnect: () => socketClient.disconnect(),
     send: (message) => socketClient.send(message),
     // キーによる型取得のためのジェネリクス
