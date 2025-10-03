@@ -129,7 +129,7 @@ export class RTCClient {
 
       const constraints: MediaStreamConstraints = {
         video: hasVideoInput ? { width: 1280, height: 720 } : false,
-         audio: hasAudioInput ? true: false,
+        audio: hasAudioInput ? true : false,
       };
 
       if ( !hasVideoInput && !hasAudioInput ) {
