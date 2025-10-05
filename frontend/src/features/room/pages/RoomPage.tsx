@@ -12,6 +12,10 @@ import { SignalingProvider } from '../../../app/providers/SignalingProvider';
 import { useSignaling } from '../../../app/hooks/useSignaling';
 import { DataChannelProvider } from '../../../app/providers/DataChannelProvider';
 import { useDataChannel } from '../../../app/hooks/useDataChannel';
+import { DataChannelUseCase } from '../../../domains/dataChannel/dataChannelUseCase';
+import { SignalingUseCase } from '../../../domains/signaling/usecase/SignalingUseCase';
+import { User } from '../../../domains/user/models/User';
+import { TextMessageHistoryUseCase } from '../../../domains/TextMessage/usecase/TextMessageHistoryUseCase';
 
 type RoomContentProps = {
   roomId: string;
@@ -31,6 +35,49 @@ const SendMessageHandler = async (data: ChatFormData, roomId: string, uerId: str
   await usecase.sendMessage(input);
 }
 
+const setup = async (
+  DataChannel: DataChannelUseCase,
+  SignalingUseCase: SignalingUseCase,
+  TextMessageUseCase: TextMessageHistoryUseCase,
+  roomId: string,
+  user: User | null,
+  setHasNext: (hasNext: boolean) => void,
+  beforeSentAt: string,
+  setBeforeSentAt: (date: string) => void,
+) => {
+  await DataChannel.initLocalStream();
+
+  let remoteAudioEl: HTMLAudioElement | null = null;
+
+  DataChannel.onTrack((event) => {
+    const remoteStream = event.streams[0];
+    if (!remoteAudioEl) {
+      remoteAudioEl = document.createElement("audio");
+      remoteAudioEl.autoplay = true;
+      document.body.appendChild(remoteAudioEl);
+    }
+    remoteAudioEl.srcObject = remoteStream;
+  });
+
+
+  await SignalingUseCase.joinRoom({ room_id: roomId, user_id: user?.id || '' });
+  console.log("Joined room:", roomId);
+
+  const input = {
+    roomId: roomId || '',
+    limit: 10,
+    beforeSentAt,
+  };
+
+  try {
+    const res = await TextMessageUseCase.getMessageHistory(input);
+    setHasNext(res.data.hasNext);
+    setBeforeSentAt(res.data.nextBeforeSentAt);
+  } catch {
+    setHasNext(false);
+  }
+}
+
 const RoomContent = ({ roomId }: RoomContentProps) => {
   const { register, handleSubmit, reset } = useForm<ChatFormData>();
   const { user } = useAuth();
@@ -40,50 +87,23 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
   const DataChannel = useDataChannel();
 
-  // debug
-  const [remoteAudioActive, setRemoteAudioActive] = useState(false);
-
   useEffect(() => {
-    const setup = async () => {
-      await DataChannel.initLocalStream();
 
-      let remoteAudioEl: HTMLAudioElement | null = null;
-
-      DataChannel.onTrack((event) => {
-        const remoteStream = event.streams[0];
-        if (!remoteAudioEl) {
-          remoteAudioEl = document.createElement("audio");
-          remoteAudioEl.autoplay = true;
-          document.body.appendChild(remoteAudioEl);
-        }
-        remoteAudioEl.srcObject = remoteStream;
-      });
-
-
-      await SignalingUseCase.joinRoom({ room_id: roomId, user_id: user?.id || '' });
-      console.log("Joined room:", roomId);
-
-      const input = {
-        roomId: roomId || '',
-        limit: 10,
-        beforeSentAt,
-      };
-
-      try {
-        const res = await usecase.history.getMessageHistory(input);
-        setHasNext(res.data.hasNext);
-        setBeforeSentAt(res.data.nextBeforeSentAt);
-      } catch {
-        setHasNext(false);
-      }
-    }
-
-    setup();
+    setup(
+      DataChannel,
+      SignalingUseCase,
+      usecase.history,
+      roomId,
+      user,
+      setHasNext,
+      beforeSentAt,
+      setBeforeSentAt,
+    );
 
     return () => {
-      // SignalingUseCase.leaveRoom();
+      SignalingUseCase.leaveRoom();
     }
-  }, [roomId])
+  }, [])
 
   const onSubmit = handleSubmit((data) => {
     if (!user) return;
@@ -106,12 +126,6 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
 
   return (
     <div>
-      {/* デバッグ用: 音声が来ているときだけ表示 */}
-      {remoteAudioActive && (
-        <div style={{ color: "red", fontWeight: "bold" }}>
-          🎤 音声受信中...
-        </div>
-      )}
       <ChatForm {...chatProps} />
       <MessageList {...messageListProps}/>
     </div>
