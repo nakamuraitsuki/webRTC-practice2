@@ -34,8 +34,8 @@ type Config struct {
 func LoadConfig() *Config {
 	return &Config{
 		Port:        getEnv("PORT", "8080"),
-		CORSOrigin:  getEnv("CORS_ORIGIN", "http://localhost:5173"),
-		DBPath:      getEnv("DB_PATH", "database.db"),
+		CORSOrigin:  getEnv("CORS_ORIGIN", "file://"),
+		DBPath:      getEnv("DB_PATH", "config/database.db"),
 		SecretKey:   getEnv("SECRET_KEY", "secret"),
 		HashCost:    parseInt(getEnv("HASH_COST", "10")),
 		TokenExpiry: paraseDuration(getEnv("TOKEN_EXPIRY", "24h")),
