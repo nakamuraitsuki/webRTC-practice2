@@ -1,6 +1,6 @@
 class ApiClient {
   // リクエストのベースURLを保持
-  private readonly baseUrl: string;
+  readonly baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;

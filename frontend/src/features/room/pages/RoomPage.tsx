@@ -44,8 +44,12 @@ const setup = async (
   setHasNext: (hasNext: boolean) => void,
   beforeSentAt: string,
   setBeforeSentAt: (date: string) => void,
+  setMediaStream?: (stream: MediaStream) => void,
 ) => {
-  await DataChannel.initLocalStream();
+  const media = await DataChannel.initLocalStream();
+  if (setMediaStream && media) {
+    setMediaStream(media);
+  }
 
   let remoteAudioEl: HTMLAudioElement | null = null;
 
@@ -83,6 +87,7 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const { user } = useAuth();
   const { comments, usecase } = useTextMessage();
   const [hasNext, setHasNext] = useState(true);
+  const [_mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [beforeSentAt, setBeforeSentAt] = useState(new Date().toISOString());
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
   const DataChannel = useDataChannel();
@@ -98,6 +103,7 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
       setHasNext,
       beforeSentAt,
       setBeforeSentAt,
+      setMediaStream,
     );
 
     return () => {
