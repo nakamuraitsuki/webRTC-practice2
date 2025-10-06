@@ -2,10 +2,17 @@ import { app, BrowserWindow } from 'electron'
 
 const createWindow = () => {
   const isDev = process.env.NODE_ENV === 'development';
+
+  // 画面共有を有効にする
+  app.commandLine.appendSwitch('enable-usermedia-screen-capturing');
+  app.commandLine.appendSwitch('enable-experimental-web-platform-features');
+
   const win = new BrowserWindow({
-    width: 800,
-    height: 600
-  })
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
 
   if (isDev) {
     // Vite dev server を読み込む
@@ -13,7 +20,8 @@ const createWindow = () => {
     win.webContents.openDevTools()
   } else {
     // 本番ビルドされた index.html を読み込む
-    win.loadFile('index.html')
+    win.loadFile('../dist/index.html')
+    win.webContents.openDevTools()
   }
 }
 
