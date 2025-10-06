@@ -16,6 +16,8 @@ import { DataChannelUseCase } from '../../../domains/dataChannel/dataChannelUseC
 import { SignalingUseCase } from '../../../domains/signaling/usecase/SignalingUseCase';
 import { User } from '../../../domains/user/models/User';
 import { TextMessageHistoryUseCase } from '../../../domains/TextMessage/usecase/TextMessageHistoryUseCase';
+import { IconButton } from '@mui/material';
+import { FiMic, FiMicOff } from 'react-icons/fi';
 
 type RoomContentProps = {
   roomId: string;
@@ -86,8 +88,9 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const { register, handleSubmit, reset } = useForm<ChatFormData>();
   const { user } = useAuth();
   const { comments, usecase } = useTextMessage();
+  const [isMuted, setIsMuted] = useState(false);
   const [hasNext, setHasNext] = useState(true);
-  const [_mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [beforeSentAt, setBeforeSentAt] = useState(new Date().toISOString());
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
   const DataChannel = useDataChannel();
@@ -111,6 +114,16 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
     }
   }, [])
 
+  const toggleMute = () => {
+    if (!mediaStream) return;
+
+      mediaStream.getAudioTracks().forEach(track => {
+      track.enabled = isMuted; // ミュートなら再度有効化
+    });
+
+    setIsMuted(prev => !prev);
+  };
+
   const onSubmit = handleSubmit((data) => {
     if (!user) return;
     SendMessageHandler(data, roomId, user.id, usecase.live);
@@ -132,6 +145,9 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
 
   return (
     <div>
+      <IconButton onClick={toggleMute} style={{ display: 'block', margin: 'auto', outline: 'none' }}>
+        {isMuted ? <FiMicOff /> : <FiMic />}
+      </IconButton>
       <ChatForm {...chatProps} />
       <MessageList {...messageListProps}/>
     </div>
