@@ -57,7 +57,7 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		HttpOnly: true,
 		Path:     "/",
 		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   authRes.GetExp(),
 	})
 

@@ -13,7 +13,7 @@ func (h *UserHandler) Logout(c echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	return c.JSON(http.StatusOK, echo.Map{"message": "Logout successful"})
