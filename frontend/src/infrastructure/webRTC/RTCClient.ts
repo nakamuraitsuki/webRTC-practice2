@@ -119,7 +119,14 @@ export class RTCClient {
     this.pc.onicecandidate = null;
   }
 
-  async addLocalStream(): Promise<MediaStream | null> {
+  /**
+   * Electron 環境では自身のAPIで画面キャプチャ等も行えるようにする。
+   * @param getMediaStreamFn 任意の MediaStream 取得関数 (省略時はデフォルトの getUserMedia を使用)
+   * @returns 取得した MediaStream、もしくは null (デバイスがない場合)
+   */
+  async addLocalStream(
+    getMediaStreamFn?: () => Promise<MediaStream>
+  ): Promise<MediaStream | null> {
     try {
       // デバイスを確認する
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -137,7 +144,10 @@ export class RTCClient {
         return null;
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      // 任意の関数が提供されていればそれを使用
+      const stream = getMediaStreamFn 
+        ? await getMediaStreamFn() 
+        : await navigator.mediaDevices.getUserMedia(constraints);
 
       stream.getTracks().forEach(track => this.pc.addTrack(track, stream));
 
