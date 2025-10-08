@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import styles from "./index.module.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextMessage } from "../../../../domains/TextMessage/models/TextMessage";
 import { TextMessageHistoryUseCase } from "../../../../domains/TextMessage/usecase/TextMessageHistoryUseCase";
 import { GetHistoryInput } from "../../../../domains/TextMessage/repotisories/TextMessageHistoryRepository";
-import { MessageListItem } from "./MessageListItem";
+import { Avatar, Divider, List, ListItemAvatar, ListItemText } from "@mui/material";
+import { apiClient } from "../../../../infrastructure/api/apiClient";
+
+import styles from "./index.module.css";
 
 export type MessageListProps = {
   messages: TextMessage[];
@@ -66,18 +68,26 @@ export const MessageList = ({
   }, [needFetchMore, fetchMore]);
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className={styles.container}
-    >
-      {messages.map((message, index) => (
-        <MessageListItem
-          key={message.id}
-          message={message}
-          isOdd={index % 2 === 0}
-        />
-      ))}
+    <div ref={scrollContainerRef} className={styles.container}>
+      <List sx={{ width: 'fit-content', margin: 'auto', maxWidth: 360, bgcolor: 'background.paper' }}>
+        {messages.map((message) => (
+          <>
+            <ListItemAvatar>
+              <Avatar src={`${apiClient.baseUrl}/api/user/icon/${message.user_id}`} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={message.content}
+              secondary={
+                <React.Fragment>
+                  {message.sent_at}
+                </React.Fragment>
+              }
+            />
+            <Divider variant="inset" component="li" />
+          </>
+        ))}
+      </List>
       <div ref={bottomBoundaryRef} />
     </div>
-  );
+    );
 };

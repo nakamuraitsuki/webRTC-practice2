@@ -4,7 +4,6 @@ export class RTCClient {
   // 本体
   private pc: RTCPeerConnection;
   // データチャネル
-  private dataChannel?: RTCDataChannel;
 
   // ICE Candidate 一時保存用
   private pendingCandidates: RTCIceCandidateInit[] = [];
@@ -21,37 +20,6 @@ export class RTCClient {
     return this.pendingCandidates;
   }
 
-  // Data Channel の作成
-  createDataChannel(label: string = "data") {
-    this.dataChannel = this.pc.createDataChannel(label);
-    this.dataChannel.onopen = () => {
-      console.log("Data channel is open");
-    };
-    this.dataChannel.onmessage = (event) => {
-      console.log("Received message:", event.data);
-    };
-    this.dataChannel.onclose = () => {
-      console.log("Data channel is closed");
-    };
-  }
-
-  onDataChannel(callback: (channel: RTCDataChannel) => void) {
-    this.pc.ondatachannel = (event) => {
-      console.log("Data channel received");
-      this.dataChannel = event.channel;
-      this.dataChannel.onopen = () => {
-        console.log("Data channel is open");
-      };
-      this.dataChannel.onmessage = (event) => {
-        console.log("Received message:", event.data);
-      };
-      this.dataChannel.onclose = () => {
-        console.log("Data channel is closed");
-      };
-      callback(this.dataChannel);
-    };
-  }
-
   onTrack(callback: (event: RTCTrackEvent) => void) {
     this.pc.ontrack = (event) => {
       console.log("Track event:", event);
@@ -64,10 +32,7 @@ export class RTCClient {
    * @param options { withDataChannel?: boolean } - if true, create a DataChannel
    * @returns offer 
    */
-  async createOffer(options?: { withDataChannel?: boolean }): Promise<RTCSessionDescriptionInit> {
-    if ( options?.withDataChannel ) {
-      this.createDataChannel();
-    }
+  async createOffer(_options?: { withDataChannel?: boolean }): Promise<RTCSessionDescriptionInit> {
     const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
     console.log("create offer", offer);
@@ -119,26 +84,40 @@ export class RTCClient {
     this.pc.onicecandidate = null;
   }
 
-  async addLocalStream(): Promise<MediaStream | null> {
+  /**
+   * Electron 環境では自身のAPIで画面キャプチャ等も行えるようにする。
+   * @param getMediaStreamFn 任意の MediaStream 取得関数 (省略時はデフォルトの getUserMedia を使用)
+   * @returns 取得した MediaStream、もしくは null (デバイスがない場合)
+   */
+  async addLocalStream(
+    getMediaStreamFn?: () => Promise<MediaStream | null>
+  ): Promise<MediaStream | null> {
     try {
       // デバイスを確認する
       const devices = await navigator.mediaDevices.enumerateDevices();
 
-      const hasVideoInput = devices.some( d => d.kind === 'videoinput' );
-      const hasAudioInput = devices.some( d => d.kind === 'audioinput' );
+      const hasVideoInput = devices.some(d => d.kind === 'videoinput');
+      const hasAudioInput = devices.some(d => d.kind === 'audioinput');
 
       const constraints: MediaStreamConstraints = {
         video: hasVideoInput ? { width: 1280, height: 720 } : false,
         audio: hasAudioInput ? true : false,
       };
 
-      if ( !hasVideoInput && !hasAudioInput ) {
+      if (!hasVideoInput && !hasAudioInput) {
         console.warn("No media input devices found.");
         return null;
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      // 任意の関数が提供されていればそれを使用
+      const stream = getMediaStreamFn
+        ? await getMediaStreamFn()
+        : await navigator.mediaDevices.getUserMedia(constraints);
 
+      if (!stream) {
+        console.warn("No media stream obtained.");
+        return null;
+      }
       stream.getTracks().forEach(track => this.pc.addTrack(track, stream));
 
       return stream;
