@@ -18,6 +18,7 @@ import { User } from '../../../domains/user/models/User';
 import { TextMessageHistoryUseCase } from '../../../domains/TextMessage/usecase/TextMessageHistoryUseCase';
 import { IconButton } from '@mui/material';
 import { FiMic, FiMicOff } from 'react-icons/fi';
+import { getElectronScreenStream } from '../../../infrastructure/webRTC/electronMedia';
 
 type RoomContentProps = {
   roomId: string;
@@ -46,11 +47,11 @@ const setup = async (
   setHasNext: (hasNext: boolean) => void,
   beforeSentAt: string,
   setBeforeSentAt: (date: string) => void,
-  setMediaStream?: (stream: MediaStream) => void,
+  setMediaStream?: (stream: MediaStream[]) => void,
 ) => {
   const media = await localMedia.initLocalStream();
   if (setMediaStream && media) {
-    setMediaStream(media);
+    setMediaStream([media]);
   }
 
   let remoteAudioEl: HTMLAudioElement | null = null;
@@ -90,10 +91,11 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const { comments, usecase } = useTextMessage();
   const [isMuted, setIsMuted] = useState(false);
   const [hasNext, setHasNext] = useState(true);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream[]>([]);
   const [beforeSentAt, setBeforeSentAt] = useState(new Date().toISOString());
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
   const localMedia = useLocalMedia();
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
 
   useEffect(() => {
 
@@ -117,11 +119,47 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const toggleMute = () => {
     if (!mediaStream) return;
 
-    mediaStream.getAudioTracks().forEach(track => {
+    mediaStream[0].getAudioTracks().forEach(track => {
       track.enabled = isMuted; // ミュートなら再度有効化
     });
 
     setIsMuted(prev => !prev);
+  };
+
+  const startScreenShare = async () => {
+    if (!user) return;
+
+    try {
+      const screenStream = await localMedia.initLocalStream(getElectronScreenStream);
+
+      if (!screenStream) {
+        console.warn("No screen stream obtained.");
+        return;
+      }
+
+      // 既存配列に追加
+      setMediaStream(prev => [...prev, screenStream]);
+
+      // 動画表示用
+      const videoEl = document.createElement("video");
+      videoEl.autoplay = true;
+      videoEl.muted = true; // 自分の画面はミュート
+      videoEl.srcObject = screenStream;
+      videoEl.style.width = "50%";
+      videoEl.style.border = "1px solid #ccc";
+      document.body.appendChild(videoEl);
+
+      setIsScreenSharing(true);
+
+      // screenStreamの終了イベントで停止処理
+      screenStream.getVideoTracks()[0].onended = () => {
+        setMediaStream(prev => prev.filter(s => s !== screenStream));
+        videoEl.remove();
+        setIsScreenSharing(false);
+      };
+    } catch (err) {
+      console.error("Failed to start screen share:", err);
+    }
   };
 
   const onSubmit = handleSubmit((data) => {
@@ -147,6 +185,9 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
     <div>
       <IconButton onClick={toggleMute} style={{ display: 'block', margin: 'auto', outline: 'none' }}>
         {isMuted ? <FiMicOff /> : <FiMic />}
+      </IconButton>
+      <IconButton onClick={startScreenShare} disabled={isScreenSharing}>
+        {isScreenSharing ? "Sharing..." : "Share Screen"}
       </IconButton>
       <ChatForm {...chatProps} />
       <MessageList {...messageListProps} />

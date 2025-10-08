@@ -90,30 +90,34 @@ export class RTCClient {
    * @returns 取得した MediaStream、もしくは null (デバイスがない場合)
    */
   async addLocalStream(
-    getMediaStreamFn?: () => Promise<MediaStream>
+    getMediaStreamFn?: () => Promise<MediaStream | null>
   ): Promise<MediaStream | null> {
     try {
       // デバイスを確認する
       const devices = await navigator.mediaDevices.enumerateDevices();
 
-      const hasVideoInput = devices.some( d => d.kind === 'videoinput' );
-      const hasAudioInput = devices.some( d => d.kind === 'audioinput' );
+      const hasVideoInput = devices.some(d => d.kind === 'videoinput');
+      const hasAudioInput = devices.some(d => d.kind === 'audioinput');
 
       const constraints: MediaStreamConstraints = {
         video: hasVideoInput ? { width: 1280, height: 720 } : false,
         audio: hasAudioInput ? true : false,
       };
 
-      if ( !hasVideoInput && !hasAudioInput ) {
+      if (!hasVideoInput && !hasAudioInput) {
         console.warn("No media input devices found.");
         return null;
       }
 
       // 任意の関数が提供されていればそれを使用
-      const stream = getMediaStreamFn 
-        ? await getMediaStreamFn() 
+      const stream = getMediaStreamFn
+        ? await getMediaStreamFn()
         : await navigator.mediaDevices.getUserMedia(constraints);
 
+      if (!stream) {
+        console.warn("No media stream obtained.");
+        return null;
+      }
       stream.getTracks().forEach(track => this.pc.addTrack(track, stream));
 
       return stream;

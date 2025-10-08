@@ -40,7 +40,7 @@ export interface RTCService {
    */
   removeIceCandidateCallback: () => void
 
-  initLocalStream: (getMediaStreamFn?: () => Promise<MediaStream>) => Promise<MediaStream | null>
+  initLocalStream: (getMediaStreamFn?: () => Promise<MediaStream|null>) => Promise<MediaStream | null>
 
   onTrack: (callback: (event: RTCTrackEvent) => void) => void
   
