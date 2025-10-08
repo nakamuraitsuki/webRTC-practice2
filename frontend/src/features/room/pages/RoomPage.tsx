@@ -58,13 +58,28 @@ const setup = async (
 
   localMedia.onTrack((event) => {
     const remoteStream = event.streams[0];
-    if (!remoteAudioEl) {
-      remoteAudioEl = document.createElement("audio");
-      remoteAudioEl.autoplay = true;
-      document.body.appendChild(remoteAudioEl);
+
+    // 音声用
+    if (remoteStream.getAudioTracks().length > 0) {
+      if (!remoteAudioEl) {
+        remoteAudioEl = document.createElement("audio");
+        remoteAudioEl.autoplay = true;
+        document.body.appendChild(remoteAudioEl);
+      }
+      remoteAudioEl.srcObject = remoteStream;
     }
-    remoteAudioEl.srcObject = remoteStream;
+
+    // 動画用（画面共有やカメラ映像）
+    if (remoteStream.getVideoTracks().length > 0) {
+      const videoEl = document.createElement("video");
+      videoEl.autoplay = true;
+      videoEl.srcObject = remoteStream;
+      videoEl.style.width = "50%";
+      videoEl.style.border = "1px solid #ccc";
+      document.body.appendChild(videoEl);
+    }
   });
+
 
 
   await SignalingUseCase.joinRoom({ room_id: roomId, user_id: user?.id || '' });
