@@ -10,9 +10,9 @@ import { MessageList, MessageListProps } from '../components/MessageList';
 import { RTCProvider } from '../../../app/providers/RTCProvider';
 import { SignalingProvider } from '../../../app/providers/SignalingProvider';
 import { useSignaling } from '../../../app/hooks/useSignaling';
-import { DataChannelProvider } from '../../../app/providers/DataChannelProvider';
-import { useDataChannel } from '../../../app/hooks/useDataChannel';
-import { DataChannelUseCase } from '../../../domains/dataChannel/dataChannelUseCase';
+import { LocalMediaProvider } from '../../../app/providers/LocalMediaProvider';
+import { useLocalMedia } from '../../../app/hooks/useLocalMedia';
+import { LocalMediaUseCase } from '../../../domains/LocalMedia/localMediaUseCase';
 import { SignalingUseCase } from '../../../domains/signaling/usecase/SignalingUseCase';
 import { User } from '../../../domains/user/models/User';
 import { TextMessageHistoryUseCase } from '../../../domains/TextMessage/usecase/TextMessageHistoryUseCase';
@@ -38,7 +38,7 @@ const SendMessageHandler = async (data: ChatFormData, roomId: string, uerId: str
 }
 
 const setup = async (
-  DataChannel: DataChannelUseCase,
+  localMedia: LocalMediaUseCase,
   SignalingUseCase: SignalingUseCase,
   TextMessageUseCase: TextMessageHistoryUseCase,
   roomId: string,
@@ -48,14 +48,14 @@ const setup = async (
   setBeforeSentAt: (date: string) => void,
   setMediaStream?: (stream: MediaStream) => void,
 ) => {
-  const media = await DataChannel.initLocalStream();
+  const media = await localMedia.initLocalStream();
   if (setMediaStream && media) {
     setMediaStream(media);
   }
 
   let remoteAudioEl: HTMLAudioElement | null = null;
 
-  DataChannel.onTrack((event) => {
+  localMedia.onTrack((event) => {
     const remoteStream = event.streams[0];
     if (!remoteAudioEl) {
       remoteAudioEl = document.createElement("audio");
@@ -93,12 +93,12 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [beforeSentAt, setBeforeSentAt] = useState(new Date().toISOString());
   const SignalingUseCase = useSignaling({ userId: user?.id || '', roomId });
-  const DataChannel = useDataChannel();
+  const localMedia = useLocalMedia();
 
   useEffect(() => {
 
     setup(
-      DataChannel,
+      localMedia,
       SignalingUseCase,
       usecase.history,
       roomId,
@@ -117,7 +117,7 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
   const toggleMute = () => {
     if (!mediaStream) return;
 
-      mediaStream.getAudioTracks().forEach(track => {
+    mediaStream.getAudioTracks().forEach(track => {
       track.enabled = isMuted; // ミュートなら再度有効化
     });
 
@@ -149,7 +149,7 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
         {isMuted ? <FiMicOff /> : <FiMic />}
       </IconButton>
       <ChatForm {...chatProps} />
-      <MessageList {...messageListProps}/>
+      <MessageList {...messageListProps} />
     </div>
   )
 }
@@ -165,9 +165,9 @@ export const RoomPage = () => {
       <RTCProvider>
         <SignalingProvider>
           <TextMessageProvider>
-            <DataChannelProvider>
+            <LocalMediaProvider>
               <RoomContent roomId={roomId} />
-            </DataChannelProvider>
+            </LocalMediaProvider>
           </TextMessageProvider>
         </SignalingProvider>
       </RTCProvider>

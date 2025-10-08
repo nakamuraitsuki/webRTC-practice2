@@ -1,14 +1,14 @@
 import { RTCService } from "../services/rtcService"
 
-export interface DataChannelUseCase {
+export interface LocalMediaUseCase {
   initLocalStream: () => Promise<MediaStream | null>
   onTrack: (callback: (event: RTCTrackEvent) => void) => void
   closeConnection: () => void
 }
 
-export const createDataChannelUseCase = (
+export const createLocalMediaUseCase = (
   rtc: RTCService
-): DataChannelUseCase => {
+): LocalMediaUseCase => {
   return {
     initLocalStream: async () => rtc.initLocalStream(),
     onTrack: (callback) => rtc.onTrack(callback),

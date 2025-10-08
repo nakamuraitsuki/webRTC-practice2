@@ -4,7 +4,6 @@ export class RTCClient {
   // 本体
   private pc: RTCPeerConnection;
   // データチャネル
-  private dataChannel?: RTCDataChannel;
 
   // ICE Candidate 一時保存用
   private pendingCandidates: RTCIceCandidateInit[] = [];
@@ -21,37 +20,6 @@ export class RTCClient {
     return this.pendingCandidates;
   }
 
-  // Data Channel の作成
-  createDataChannel(label: string = "data") {
-    this.dataChannel = this.pc.createDataChannel(label);
-    this.dataChannel.onopen = () => {
-      console.log("Data channel is open");
-    };
-    this.dataChannel.onmessage = (event) => {
-      console.log("Received message:", event.data);
-    };
-    this.dataChannel.onclose = () => {
-      console.log("Data channel is closed");
-    };
-  }
-
-  onDataChannel(callback: (channel: RTCDataChannel) => void) {
-    this.pc.ondatachannel = (event) => {
-      console.log("Data channel received");
-      this.dataChannel = event.channel;
-      this.dataChannel.onopen = () => {
-        console.log("Data channel is open");
-      };
-      this.dataChannel.onmessage = (event) => {
-        console.log("Received message:", event.data);
-      };
-      this.dataChannel.onclose = () => {
-        console.log("Data channel is closed");
-      };
-      callback(this.dataChannel);
-    };
-  }
-
   onTrack(callback: (event: RTCTrackEvent) => void) {
     this.pc.ontrack = (event) => {
       console.log("Track event:", event);
@@ -64,10 +32,7 @@ export class RTCClient {
    * @param options { withDataChannel?: boolean } - if true, create a DataChannel
    * @returns offer 
    */
-  async createOffer(options?: { withDataChannel?: boolean }): Promise<RTCSessionDescriptionInit> {
-    if ( options?.withDataChannel ) {
-      this.createDataChannel();
-    }
+  async createOffer(_options?: { withDataChannel?: boolean }): Promise<RTCSessionDescriptionInit> {
     const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
     console.log("create offer", offer);

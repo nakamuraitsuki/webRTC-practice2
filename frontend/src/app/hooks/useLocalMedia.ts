@@ -1,8 +1,8 @@
 import { useContext } from "react"
-import { DataChannelContext } from "../providers/DataChannelProvider"
+import { LocalMediaContext } from "../providers/LocalMediaProvider"
 
-export const useDataChannel = () => {
-  const context = useContext(DataChannelContext);
+export const useLocalMedia = () => {
+  const context = useContext(LocalMediaContext);
   if (!context) {
     throw new Error("useDataChannel must be used within a DataChannelProvider");
   }
