@@ -167,11 +167,16 @@ const RoomContent = ({ roomId }: RoomContentProps) => {
       setIsScreenSharing(true);
 
       // screenStreamの終了イベントで停止処理
-      screenStream.getVideoTracks()[0].onended = () => {
-        setMediaStream(prev => prev.filter(s => s !== screenStream));
-        videoEl.remove();
-        setIsScreenSharing(false);
-      };
+      const videoTracks = screenStream.getVideoTracks();
+      if (videoTracks.length > 0) {
+        videoTracks[0].onended = () => {
+          setMediaStream(prev => prev.filter(s => s !== screenStream));
+          videoEl.remove();
+          setIsScreenSharing(false);
+        };
+      } else {
+        console.warn("No video tracks found in screen stream.");
+      }
     } catch (err) {
       console.error("Failed to start screen share:", err);
     }
