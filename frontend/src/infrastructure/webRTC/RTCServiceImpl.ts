@@ -11,7 +11,7 @@ export const createRTCService = (): RTCService => {
     addRemoteIceCandidate: (candidate) => rtcClient.addIceCandidate(candidate),
     addIceCandidateCallback: (callback) => rtcClient.addIceCandidateCallback(callback),
     removeIceCandidateCallback: () => rtcClient.removeIceCandidateCallback(),
-    initLocalStream: () => rtcClient.addLocalStream(),
+    initLocalStream: (getMediaStreamFn?: () => Promise<MediaStream>) => rtcClient.addLocalStream(getMediaStreamFn),
     onTrack: (callback) => rtcClient.onTrack(callback),
     closeConnection: () => rtcClient.closeConnection(),
   }
