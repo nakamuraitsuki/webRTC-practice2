@@ -3,6 +3,7 @@ package di
 import (
 	"example.com/infrahandson/config"
 	mysqlgatewayimpl "example.com/infrahandson/internal/infrastructure/gatewayImpl/db/mysql"
+	"example.com/infrahandson/internal/infrastructure/gatewayImpl/db/postgresql"
 	sqlitegatewayimpl "example.com/infrahandson/internal/infrastructure/gatewayImpl/db/sqlite"
 	"example.com/infrahandson/internal/interface/gateway"
 	"example.com/infrahandson/internal/interface/handler"
@@ -37,7 +38,14 @@ func InitializeDependencies(cfg *config.Config) *Dependencies {
 			DSN:            cfg.MySQLDSN,
 			MigrationsPath: "./internal/infrastructure/gatewayImpl/db/mysql/migrations",
 		})
-	} else {
+	} else if cfg.PostgresDSN != nil {
+		// Postgres用のDSNが設定されている場合、Postgres用のイニシャライザーを用意
+		dbType = DBTypePostgres
+		initializer = postgresql.NewPostgresInitializer(&postgresql.NewPostgresInitializerParams{
+			DSN:            cfg.PostgresDSN,
+			MigrationsPath: "./internal/infrastructure/gatewayImpl/db/postgres/migrations",
+		})
+	} else{
 		// SQLite用のイニシャライザーを用意
 		dbType = DBTypeSQLite
 		initializer = sqlitegatewayimpl.NewSQLiteInitializer(&sqlitegatewayimpl.NewSQLiteInitializerParams{

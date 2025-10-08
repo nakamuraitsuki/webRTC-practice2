@@ -17,6 +17,7 @@ type Config struct {
 	TokenExpiry time.Duration // JWTトークンの有効期限
 	// DB
 	MySQLDSN *string // MySQL用データベースのDSN
+	PostgresDSN *string // Postgres用データベースのDSN
 	// Cache
 	MemcachedAddr *string // Memcachedのアドレス
 	// IconStore
@@ -41,6 +42,7 @@ func LoadConfig() *Config {
 		TokenExpiry: paraseDuration(getEnv("TOKEN_EXPIRY", "24h")),
 		// DB
 		MySQLDSN: parseStringPointer(getEnv("MYSQL_DSN", "")),
+		PostgresDSN: parseStringPointer(getEnv("POSTGRES_DSN", "")),
 		// Cache
 		MemcachedAddr: parseStringPointer(getEnv("MEMCACHED_ADDR", "")),
 		//IconStore
