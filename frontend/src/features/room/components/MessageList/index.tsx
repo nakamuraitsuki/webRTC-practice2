@@ -69,7 +69,7 @@ export const MessageList = ({
 
   return (
     <div ref={scrollContainerRef} className={styles.container}>
-      <List sx={{ width: 'fit-couten', margin: 'auto', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <List sx={{ width: 'fit-content', margin: 'auto', maxWidth: 360, bgcolor: 'background.paper' }}>
         {messages.map((message) => (
           <>
             <ListItemAvatar>
