@@ -79,35 +79,6 @@ func (r *RoomRepositoryImpl) GetRoomByID(ctx context.Context, id entity.RoomID) 
 	return room, nil
 }
 
-func (r *RoomRepositoryImpl) GetRoomByPubID(ctx context.Context, id entity.RoomID) (*entity.Room, error) {
-	roomModel := model.RoomModel{}
-	// RoomID -> UUID
-	idUUID, err := id.RoomID2UUID()
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.db.GetContext(ctx, &roomModel, `SELECT BIN_TO_UUID(id) AS id, name FROM rooms WHERE id = UUID_TO_BIN(?)`, idUUID)
-	if err != nil {
-		return nil, err
-	}
-
-	// ルームに所属しているユーザーを取得
-	roomMembers := []model.RoomMemberModel{}
-	err = r.db.SelectContext(ctx, &roomMembers, `SELECT BIN_TO_UUID(user_id) AS user_id FROM room_members WHERE room_id = UUID_TO_BIN(?)`, roomModel.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	room := entity.NewRoom(entity.RoomParams{
-		ID:      entity.RoomID(roomModel.ID.String()),
-		Name:    roomModel.Name,
-		Members: make([]entity.UserID, len(roomMembers)),
-	})
-
-	return room, nil
-}
-
 func (r *RoomRepositoryImpl) GetAllRooms(ctx context.Context) ([]*entity.Room, error) {
 	roomModels := []model.RoomModel{}
 	err := r.db.SelectContext(ctx, &roomModels, `SELECT BIN_TO_UUID(id) AS id, name FROM rooms`)
